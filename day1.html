@@ -72,13 +72,17 @@ readonly>
 <h2 id="timer">⏰ 20:00</h2>
 
 <div id="questions"></div>
-<p id="msg">
-<button onclick="checkResult()">
+
+<button id="submitBtn"
+onclick="checkResult()"
+style="display:none;">
 📝 Submit Test
 </button>
 
 <div id="result"></div>
-</p></div><div class="footer">
+
+<p id="msg"></p>
+</div><div class="footer">
 Prepared By: Md Faiyaz
 </div><script>
 let timerStarted = false;
@@ -224,6 +228,7 @@ return;
 document.getElementById("msg").innerHTML =
 "✅ Welcome " + students[roll];
 document.getElementById("questions").innerHTML = `
+document.getElementById("submitBtn").style.display = "block";
 <h3>Q1. 25 + 17 = ?</h3>
 <input type="radio" name="q1" value="0">40<br>
 <input type="radio" name="q1" value="1">42<br>
