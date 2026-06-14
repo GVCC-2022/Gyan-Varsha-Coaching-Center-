@@ -165,8 +165,22 @@ border-radius:10px;
 </div>
 </div><button onclick="checkResult()">Submit Test</button>
 
-<div id="result"></div><script>
+<div id="result"></div>
+
+<script>
 function checkResult(){
+
+let roll = document.getElementById("roll").value;
+
+let validRolls = [
+"901","902","903","904","905","906","907","908",
+"909","910","911","912","913","914","915","916"
+];
+
+if(!validRolls.includes(roll)){
+alert("Invalid Roll Number! Apna sahi coaching roll number daaliye.");
+return;
+}
 
 let score=0;
 
@@ -189,5 +203,7 @@ document.getElementById("result").innerHTML=
 "<p>Gyan Varsha Coaching Center</p>"+
 "<p>Prepared By: Md Faiyaz</p>";
 }
-</script></body>
+</script>
+
+</body>
 </html>
