@@ -228,7 +228,6 @@ return;
 document.getElementById("msg").innerHTML =
 "✅ Welcome " + students[roll];
 document.getElementById("questions").innerHTML = `
-document.getElementById("submitBtn").style.display = "block";
 <h3>Q1. 25 + 17 = ?</h3>
 <input type="radio" name="q1" value="0">40<br>
 <input type="radio" name="q1" value="1">42<br>
@@ -370,7 +369,7 @@ document.getElementById("submitBtn").style.display = "block";
 <input type="radio" name="q30" value="0">523<br>
 <input type="radio" name="q30" value="0">533<br><br>
 `;
-
+document.getElementById("submitBtn").style.display = "block";
 let time = 1200;
 
 let timer = setInterval(function(){
