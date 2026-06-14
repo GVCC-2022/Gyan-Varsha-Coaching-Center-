@@ -68,7 +68,7 @@ readonly>
 <p id="msg"></p></div><div class="footer">
 Prepared By: Md Faiyaz
 </div><script>
-
+let timerStarted = false;
 let students = {
 
 "801":"Anamika Kumari",
@@ -146,6 +146,14 @@ students[roll] || "";
 }
 
 function startMission(){
+if(timerStarted){
+alert("Test Already Started!");
+return;
+}
+
+timerStarted = true;
+
+document.getElementById("startBtn").disabled = true;
 
 let roll =
 document.getElementById("roll").value;
