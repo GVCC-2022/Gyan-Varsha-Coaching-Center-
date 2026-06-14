@@ -347,7 +347,6 @@ if(time < 0){
 
 document.getElementById("timer").innerHTML =
    "⏰ Time Over!";
-document.getElementById("submitBtn").style.display = "none";
 let msg =
 "🧮 Gyan Varsha Basic Maths Mission Day 1%0A%0A" +
 "Name: " + document.getElementById("name").value + "%0A" +
@@ -361,7 +360,8 @@ document.getElementById("waBtn").href =
 "https://wa.me/916203491210?text=" + msg;
 
 document.getElementById("waBtn").style.display = "block";
-   checkResult();
+document.getElementById("submitBtn").style.display = "none";
+
 }
 
 },1000);
