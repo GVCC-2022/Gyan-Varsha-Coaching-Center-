@@ -43,13 +43,13 @@ margin-top:30px;
 
 <body>
 <script>
-let pass = prompt("Enter Notes Password");
+let pass = prompt("🔒 Enter Notes Password");
 
-if(pass != "GVCC@437"){
-document.write("<h2>❌ Wrong Password</h2>");
+if(pass !== "GVCC@437"){
+document.body.innerHTML = "";
 throw new Error("Access Denied");
 }
-  </script>
+</script>
 
 <div class="header">
 <h1>📚 Notes Section</h1>
