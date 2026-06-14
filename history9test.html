@@ -230,11 +230,17 @@ document.getElementById("result").innerHTML=
 "<h3>"+status+"</h3>"+
 "<hr>"+
 "<p>Gyan Varsha Coaching Center</p>"+
-"<p>Prepared By: Md Faiyaz</p>";
+"<p>Prepared By: Md Faiyaz</p>" +
 
-}
+"<br><a href='https://wa.me/916203491210?text=" +
 
-</script>
+encodeURIComponent(
+"📚 Gyan Varsha Coaching Center\n\n" +
+"Name: " + document.getElementById('name').value + "\n" +
+"Roll No: " + document.getElementById('roll').value + "\n" +
+"Score: " + score + "/15\n" +
+"Percentage: " + percent.toFixed(0) + "%\n" +
+"Result: " + status
+)
 
-</body>
-</html>
++ "' target='_blank' style='background:#25D366;color:white;padding:10px 15px;text-decoration:none;border-radius:8px;'>📲 Send Result on WhatsApp</a>";
