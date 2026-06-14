@@ -355,11 +355,12 @@ document.querySelectorAll('input[type=radio]:checked')
 .forEach(e => score += Number(e.value));
 
 let percent = (score/30)*100;
+let status = percent >= 60 ? "✅ PASS" : "❌ FAIL";
 
 document.getElementById("result").innerHTML =
 "<h2>Result</h2>" +
 "<p>Score: " + score + "/30</p>" +
-"<p>Percentage: " + percent.toFixed(0) + "%</p>";
+"<p>Percentage: " + percent.toFixed(0) + "%</p>" + "<h3>" + status + "</h3>";
 
 }
 </script></body>
