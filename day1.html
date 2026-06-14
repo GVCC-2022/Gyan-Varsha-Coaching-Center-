@@ -72,6 +72,11 @@ readonly>
 <h2 id="timer">⏰ 15:00</h2>
 
 <div id="questions"></div>
+<a id="waBtn"
+target="_blank"
+style="display:none;">
+📲 Send Result to Teacher
+</a>
 
 <button id="submitBtn"
 onclick="checkResult()"
@@ -343,7 +348,19 @@ if(time < 0){
 document.getElementById("timer").innerHTML =
    "⏰ Time Over!";
 document.getElementById("submitBtn").style.display = "none";
+let msg =
+"🧮 Gyan Varsha Basic Maths Mission Day 1%0A%0A" +
+"Name: " + document.getElementById("name").value + "%0A" +
+"Roll No: " + document.getElementById("roll").value + "%0A" +
+"Score: " + score + "/30%0A" +
+"Percentage: " + percent.toFixed(0) + "%%0A" +
+"Result: " + status + "%0A" +
+"Medal: " + medal;
 
+document.getElementById("waBtn").href =
+"https://wa.me/916203491210?text=" + msg;
+
+document.getElementById("waBtn").style.display = "block";
    checkResult();
 }
 
