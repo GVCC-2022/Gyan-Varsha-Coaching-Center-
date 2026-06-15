@@ -382,7 +382,7 @@ document.getElementById("submitBtn").style.display = "none";
 },1000);
 }
 
-function saveResult(){
+function checkResult(){
 let roll = document.getElementById("roll").value;
 
 const q = query(
@@ -397,12 +397,12 @@ getDocs(q).then((snapshot) => {
     return;
   }
 
-  saveResult();
+  processResult();
 
 });
 return;
 }
-
+function processResult(){
 let score = 0;
 
 document.querySelectorAll('input[type=radio]:checked')
