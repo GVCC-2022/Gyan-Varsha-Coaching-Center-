@@ -230,6 +230,22 @@ document.getElementById("startBtn").disabled = true;
 
 let roll =
 document.getElementById("roll").value;
+navigator.mediaDevices.getUserMedia({
+  video: true
+})
+.then(function(stream){
+
+  document.getElementById("camera").style.display = "block";
+
+  document.getElementById("camera").srcObject = stream;
+
+})
+.catch(function(){
+
+  alert("❌ Camera Permission Required");
+  return;
+
+});
   let password =
 document.getElementById("password").value;
 
