@@ -253,7 +253,7 @@ if(password !== "GVCCDAY2"){
    alert("❌ Wrong Password");
    return;
 }
-let warningCount = 0;
+  let warningCount = 0;
 
 document.addEventListener("visibilitychange", function(){
 
@@ -261,11 +261,7 @@ document.addEventListener("visibilitychange", function(){
 
     warningCount++;
 
-    alert(
-      "⚠ Warning " +
-      warningCount +
-      ": Test ke dauran app/tab switch detect hua."
-    );
+    console.log("Warning:", warningCount);
 
   }
 
@@ -459,6 +455,9 @@ const q = query(
   where("roll", "==", roll)
 );
 
+document.getElementById("msg").innerHTML =
+"Warnings: " + warningCount;
+  
 getDocs(q).then((snapshot) => {
 
   if (!snapshot.empty) {
