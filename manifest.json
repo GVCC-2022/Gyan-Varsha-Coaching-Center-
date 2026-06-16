@@ -6,9 +6,10 @@
   "background_color": "#083d77",
   "theme_color": "#083d77",
   "icons": [
-  {
-    "src": "logo.png",
-    "sizes": "512x512",
-    "type": "image/png"
-  }
+    {
+      "src": "logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ]
+}
