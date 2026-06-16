@@ -203,6 +203,10 @@ document.getElementById("startBtn").disabled = true;
 
 let roll =
 document.getElementById("roll").value;
+if(!allowedStudents.includes(roll)){
+   alert("❌ Aap Day 2 ke liye eligible nahi hain.");
+   return;
+}
 if(localStorage.getItem("day1_" + roll)){
 alert("❌ Aap Day 1 Test pehle hi submit kar chuke hain.");
 return;
