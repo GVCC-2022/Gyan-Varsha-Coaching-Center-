@@ -1,7 +1,7 @@
 <!DOCTYPE html><html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Day 1 - Basic Maths Mission</title><style>
+<title>Day 2 - Basic Maths Mission</title><style>
 body{
 font-family:Arial,sans-serif;
 background:#f4f6f9;
@@ -222,7 +222,7 @@ if(!allowedStudents.includes(roll)){
    alert("❌ Aap Day 2 ke liye eligible nahi hain.");
    return;
 }
-if(localStorage.getItem("day1_" + roll)){
+if(localStorage.getItem("day2_" + roll)){
 alert("❌ Aap Day 1 Test pehle hi submit kar chuke hain.");
 return;
 }
@@ -400,7 +400,7 @@ if(time < 0){
 document.getElementById("timer").innerHTML =
    "⏰ Time Over!";
 let msg =
-"🧮 Gyan Varsha Basic Maths Mission Day 1%0A%0A" +
+"🧮 Gyan Varsha Basic Maths Mission Day 2%0A%0A" +
 "Name: " + document.getElementById("name").value + "%0A" +
 "Roll No: " + document.getElementById("roll").value + "%0A" +
 "Score: " + score + "/30%0A" +
@@ -445,7 +445,7 @@ let score = 0;
 document.querySelectorAll('input[type=radio]:checked')
 .forEach(e => score += Number(e.value));
 localStorage.setItem(
-"day1_" + document.getElementById("roll").value,
+"day2_" + document.getElementById("roll").value,
 "submitted"
 );
 
