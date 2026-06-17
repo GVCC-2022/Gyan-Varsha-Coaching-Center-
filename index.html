@@ -57,7 +57,8 @@ color:white;
 <link rel="manifest" href="manifest.json">
 </head>
   
-<script>
+<body>
+  <script>
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", function() {
     navigator.serviceWorker.register("service-worker.js")
@@ -69,9 +70,7 @@ if ("serviceWorker" in navigator) {
       });
   });
 }
-</script>
-  
-<body>
+  </script>
 
 <div class="header">
 <h1>📚 Gyan Varsha Coaching Center</h1>
