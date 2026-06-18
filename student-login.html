@@ -115,10 +115,13 @@ if(docSnap.exists()){
 let data =
 docSnap.data();
 
-alert(JSON.stringify(data));
-  
-if(String(data.Password).trim() === String(password).trim()){
-  
+alert(
+"DB=[" + data.Password.trim() +
+"] INPUT=[" + password.trim() + "]"
+);
+
+if(data.Password.trim() === password.trim()){
+
 localStorage.setItem(
 "studentRoll",
 roll
@@ -128,8 +131,6 @@ window.location.href =
 "dashboard.html";
 
 }else{
-document.getElementById("msg").innerHTML =
-data.Password + " | " + password;
 
 document.getElementById("msg").innerHTML =
 "❌ Wrong Password";
