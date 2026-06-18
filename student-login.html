@@ -44,23 +44,22 @@ body {
     animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* ✨ Premium Floating Logo Style (As per your concept!) */
+/* ✨ Premium Floating Logo Style (Corrected & Bigger) */
 .login-logo {
-    width: 110px;
-    height: 110px;
+    width: 140px;          /* 🛠️ Size 110px se badha kar 140px kiya (Bada dikhega) */
+    height: 140px;         /* 🛠️ Size 110px se badha kar 140px kiya */
     border-radius: 50%;
-    background: white;
-    padding: 4px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    background: transparent; /* 🛠️ Safed ghera hatane ke liye background transparent kiya */
+    padding: 0;            /* 🛠️ Padding 0 ki taaki koi extra boundary na bane */
     object-fit: cover;
     position: absolute;
-    top: -55px; /* Half logo outside the card */
+    top: -70px;            /* 🛠️ Naye size ke hisab se adha bahar set kiya (140 ka adha 70) */
     z-index: 10;
 }
 
 .login-card {
     background: white;
-    padding: 70px 25px 40px 25px; /* Extra top padding to make space for logo */
+    padding: 85px 25px 40px 25px; /* 🛠️ Logo bada hone ki wajah se top padding thodi aur badha di */
     border-radius: 24px;
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06);
     width: 100%;
@@ -68,6 +67,7 @@ body {
     box-sizing: border-box;
     position: relative;
 }
+
 
 .title {
     color: #003366;
