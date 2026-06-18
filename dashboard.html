@@ -1,129 +1,313 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>GVCC - Student Dashboard</title>
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        body { font-family: Arial, sans-serif; background: #f4f6f9; text-align: center; margin: 0; padding: 0; }
-        .header { background: #003366; color: white; padding: 20px; font-size: 20px; font-weight: bold; }
-        .sub-header { font-size: 14px; opacity: 0.8; margin-top: 5px; }
-        .tagline { background: white; color: #003366; padding: 10px; margin: 15px auto; width: 85%; max-width: 300px; font-size: 12px; font-weight: bold; border-radius: 10px; }
-        
-        .student-card { background: white; margin: 15px auto; padding: 15px; max-width: 350px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: left; width: 85%; }
-        .student-title { font-weight: bold; color: #003366; border-bottom: 2px solid #f4f6f9; padding-bottom: 5px; margin-bottom: 10px; font-size: 16px; }
-        .info-row { display: flex; justify-content: space-between; margin: 8px 0; font-size: 14px; }
-        .info-label { font-weight: bold; color: #555; }
-        .info-value { color: #333; font-weight: bold; }
+        :root {
+            --primary: #003366;
+            --secondary: #007bff;
+            --success: #28a745;
+            --danger: #dc3545;
+            --bg: #f8fafc;
+            --text-main: #1e293b;
+        }
 
-        .container { padding: 20px; }
-        .btn { display: block; background: #007bff; color: white; text-decoration: none; padding: 15px; margin: 12px auto; width: 85%; max-width: 300px; border-radius: 10px; font-size: 18px; font-weight: bold; border: none; cursor: pointer; }
-        .btn:hover { background: #0056b3; }
-        .btn-live { background: #28a745; text-decoration: none; display: inline-block; width: 85%; max-width: 300px; padding: 12px; border-radius: 8px; color: white; font-weight: bold; margin-bottom: 10px; }
-        .btn-logout { background: #dc3545; }
-        .btn-logout:hover { background: #c82333; }
-        
-        #loading { font-weight: bold; color: orange; margin: 50px auto; font-size: 18px; }
-        #mainContent { display: none; }
-        .footer { margin-top: 30px; padding: 15px; background: #003366; color: white; font-size: 14px; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 0;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Premium Header */
+        header {
+            background: linear-gradient(135deg, #002244, var(--primary));
+            color: white;
+            padding: 25px 15px;
+            text-align: center;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 22px;
+            letter-spacing: 0.5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        header p {
+            margin: 5px 0 12px 0;
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .slogan-tag {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 6px 15px;
+            border-radius: 50px;
+            font-size: 12px;
+            display: inline-block;
+            font-weight: 500;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 450px;
+            width: 90%;
+            margin: -20px auto 30px auto;
+            flex: 1;
+        }
+
+        /* Profile Card */
+        .profile-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.02);
+            margin-bottom: 25px;
+        }
+
+        .profile-header {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 8px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 14px;
+            border-bottom: 1px dashed #f1f5f9;
+        }
+        .info-row:last-child { border: none; }
+
+        .info-label { color: #64748b; font-weight: 500; }
+        .info-value { color: var(--text-main); font-weight: 600; }
+
+        /* Feature Grid System (2 Columns) */
+        .grid-menu {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        /* Full Width for Live Class */
+        .full-width {
+            grid-column: span 2;
+        }
+
+        /* Premium Dashboard Cards */
+        .menu-card {
+            background: white;
+            border: none;
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .menu-card i {
+            font-size: 24px;
+        }
+
+        .menu-card span {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Individual Card Themes */
+        .card-live {
+            background: linear-gradient(135deg, #23d5ab, var(--success));
+            color: white;
+            flex-direction: row;
+            padding: 14px;
+        }
+        .card-live i { font-size: 20px; animation: pulse 1.5s infinite; }
+
+        .card-notes { color: #3b82f6; border-top: 4px solid #3b82f6; }
+        .card-notice { color: #f59e0b; border-top: 4px solid #f59e0b; }
+        .card-test { color: #ec4899; border-top: 4px solid #ec4899; }
+        .card-day2 { color: #8b5cf6; border-top: 4px solid #8b5cf6; }
+        .card-result { color: #10b981; border-top: 4px solid #10b981; }
+        .card-performer { color: #a855f7; border-top: 4px solid #a855f7; }
+
+        /* Card Active/Hover state for Mobile */
+        .menu-card:active {
+            transform: scale(0.96);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        /* Logout Button */
+        .btn-logout {
+            width: 100%;
+            background: #ffe4e6;
+            color: var(--danger);
+            border: 1px solid #fecdd3;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .btn-logout:active { background: #fecdd3; }
+
+        /* Premium Footer */
+        footer {
+            background: #001529;
+            color: #94a3b8;
+            text-align: center;
+            padding: 15px;
+            font-size: 12px;
+            margin-top: auto;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+        }
+        footer p { margin: 4px 0; }
+        footer strong { color: white; }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
     </style>
 </head>
 <body>
 
-    <div id="loading">⏳ Securing Connection & Loading Profile...</div>
+    <!-- Header Section -->
+    <header>
+        <h1>📚 Gyan Varsha Coaching Center</h1>
+        <p>Learn • Practice • Succeed</p>
+        <div class="slogan-tag">✨ हम वादा नहीं, पर दावा जरूर करते हैं ✨</div>
+    </header>
 
-    <div id="mainContent">
-        <div class="header">
-            📚 Gyan Varsha Coaching Center
-            <div class="sub-header">Learn • Practice • Succeed</div>
-            <div class="tagline">✨ हम वादा नहीं, पर दावा जरूर करते हैं ✨</div>
+    <!-- Main Content -->
+    <div class="container">
+        
+        <!-- Student Identity Card -->
+        <div class="profile-card">
+            <div class="profile-header">
+                <i class="fa-solid fa-user-gradient"></i> 👤 Student Profile
+            </div>
+            <div class="info-row">
+                <span class="info-label">Name:</span>
+                <span class="info-value" id="studentName">Aasmin Khatoon</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Roll Number:</span>
+                <span class="info-value" id="studentRoll">1001</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Class:</span>
+                <span class="info-value" id="studentClass">10th</span>
+            </div>
         </div>
 
-        <div class="student-card">
-            <div class="student-title">👤 Student Details</div>
-            <div class="info-row"><span class="info-label">Name:</span> <span id="studentName" class="info-value">--</span></div>
-            <div class="info-row"><span class="info-label">Roll Number:</span> <span id="studentRollDisplay" class="info-value">--</span></div>
-            <div class="info-row"><span class="info-label">Class:</span> <span id="studentClass" class="info-value">--</span></div>
-        </div>
-
-        <div class="container">
-            <a href="https://meet.google.com/iwb-mgyk-mpd" class="btn-live" target="_blank">🎥 Join Live Class</a>
-            <button class="btn" onclick="window.location.href='notes.html'">📚 Notes</button>
-            <button class="btn" onclick="window.location.href='notice.html'">📢 Notice Board</button>
-            <button class="btn" onclick="window.location.href='test.html'">📝 Online Test</button>
-            <button class="btn" onclick="window.location.href='day2.html'">🚀 Day 2 Test</button>
-            <button class="btn" onclick="window.location.href='result.html'">📊 Result</button>
-            <button class="btn" onclick="window.location.href='results.html'">🚀 Day 1 Performers 🏆</button>
+        <!-- 2 Column Smart Grid Navigation -->
+        <div class="grid-menu">
             
-            <hr style="border: 0; border-top: 1px solid #ccc; margin: 20px auto; width: 85%;">
-            <button class="btn btn-logout" id="logoutBtn">🔒 Logout Securely</button>
+            <!-- Live Class Link (Full Width Action) -->
+            <a href="live-class-link-here" class="menu-card card-live full-width">
+                <i class="fa-solid fa-video"></i>
+                <span>Join Live Class</span>
+            </a>
+
+            <!-- Notes Tile -->
+            <a href="notes.html" class="menu-card card-notes">
+                <i class="fa-solid fa-book-open"></i>
+                <span>Notes</span>
+            </a>
+
+            <!-- Notice Board Tile -->
+            <a href="notice.html" class="menu-card card-notice">
+                <i class="fa-solid fa-bullhorn"></i>
+                <span>Notice Board</span>
+            </a>
+
+            <!-- Online Test Tile -->
+            <a href="test.html" class="menu-card card-test">
+                <i class="fa-solid fa-pen-to-square"></i>
+                <span>Online Test</span>
+            </a>
+
+            <!-- Day 2 Test Tile -->
+            <a href="day2-test.html" class="menu-card card-day2">
+                <i class="fa-solid fa-rocket"></i>
+                <span>Day 2 Test</span>
+            </a>
+
+            <!-- Result Tile -->
+            <a href="result.html" class="menu-card card-result">
+                <i class="fa-solid fa-chart-bar"></i>
+                <span>Result</span>
+            </a>
+
+            <!-- Performers Tile -->
+            <a href="performers.html" class="menu-card card-performer">
+                <i class="fa-solid fa-trophy"></i>
+                <span>Performers 🏆</span>
+            </a>
+
         </div>
 
-        <div class="footer">
-            <p>📚 Create By: Md Faiyaz</p>
-            <p>📍 Hirauta, Sheohar</p>
-            <p>© Gyan Varsha Coaching Center</p>
-        </div>
+        <!-- Logout Action Button -->
+        <button class="btn-logout" id="logoutBtn">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout Securely
+        </button>
+
     </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+    <!-- Footer Section -->
+    <footer>
+        <p>📝 Code By: <strong>Md Faiyaz</strong></p>
+        <p>📍 Hirauta, Sheohar</p>
+    </footer>
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyBJX_dyLK80p2rNqSVvGY67TpWV7e_UdPI",
-        authDomain: "gvcc-database.firebaseapp.com",
-        projectId: "gvcc-database",
-        storageBucket: "gvcc-database.firebasestorage.app",
-        messagingSenderId: "1063216875940",
-        appId: "1:1063216875940:web:a4ee2f39b01896b44c5931"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    const activeRoll = localStorage.getItem("studentRoll");
-    if (!activeRoll) {
-        window.location.href = "student-login.html";
-    } else {
-        fetchStudentData(activeRoll);
-    }
-
-    async function fetchStudentData(roll) {
-        try {
-            const docRef = doc(db, "students", roll);
-            const docSnap = await getDoc(docRef);
-
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                let studentName = data["Name "] || data.Name || "N/A";
-                let studentClass = data["Class "] || data.Class || "N/A";
-                
-                document.getElementById("studentName").innerText = studentName;
-                document.getElementById("studentRollDisplay").innerText = roll;
-                document.getElementById("studentClass").innerText = studentClass;
-                
-                document.getElementById("loading").style.display = "none";
-                document.getElementById("mainContent").style.display = "block";
-            } else {
-                alert("Session Error: Profile not found.");
-                logout();
-            }
-        } catch (error) {
-            console.error(error);
-            document.getElementById("loading").innerText = "⚠️ Connection timeout. Refresh the page.";
-        }
-    }
-
-    function logout() {
-        localStorage.removeItem("studentRoll");
-        window.location.href = "student-login.html";
-    }
-    document.getElementById("logoutBtn").addEventListener("click", logout);
-</script>
+    <script type="module">
+        // Agad aapke paas Firebase ka data load karne ka script hai toh use yahan bina chhede chalne dein.
+        document.getElementById("logoutBtn").addEventListener("click", function() {
+            localStorage.clear();
+            window.location.href = "student-login.html";
+        });
+    </script>
 </body>
 </html>
