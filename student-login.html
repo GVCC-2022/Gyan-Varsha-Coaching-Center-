@@ -44,35 +44,45 @@ body {
     animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* 🎯 Logo Styling - Perfect Center and Premium Shadow */
+/* 🎯 Logo Position - Fixed & Connected to the Card */
 .login-logo {
     width: 200px;
     height: auto;
     background: transparent !important;
     padding: 0 !important;
-    border-radius: 0 !important; /* Kisi bhi tarah ka round cut hatane ke liye */
+    border-radius: 0 !important;
     position: absolute;
-    top: -110px;
+    
+    /* 📐 Logo ka sirf adha hissa card ke upar rahega, baaki card ke andar balanced dikhega */
+    top: -100px; 
+    
+    /* 🎯 Exact Horizontal Center */
     left: 50%;
     transform: translateX(-50%);
-    filter: drop-shadow(0px 8px 12px rgba(0, 0, 0, 0.15));
+    
+    /* 🌟 Soft Professional Shadow */
+    filter: drop-shadow(0px 6px 10px rgba(0, 0, 0, 0.12));
     z-index: 10;
 }
 
-/* 📦 White Card Styling - Fixed & Back to Normal */
+/* 📦 White Card Position - Re-centered without extra margins */
 .login-card {
     background: #ffffff !important;
-    padding: 120px 25px 40px 25px !important; /* Top padding thodi badhai taaki text logo ke peeche na chupe */
+    
+    /* 📐 Top padding ko 110px kiya taaki andar ka text logo ke just neeche base se start ho */
+    padding: 110px 25px 40px 25px !important; 
+    
     border-radius: 24px !important;
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06) !important;
     width: 100%;
-    max-width: 400px; /* Card ko mobile par fit rakhne ke liye */
+    max-width: 400px;
     text-align: center;
     box-sizing: border-box;
     position: relative;
-    margin: 120px auto 20px auto; /* Card ko screen ke center mein lane ke liye upper margin */
+    
+    /* 📐 Faltu ka bada margin hataya, taaki pure screen par vertical alignment sahi rahe */
+    margin: 0 auto; 
 }
-
 
 
 
