@@ -34,8 +34,8 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
-    // 🛠️ Badlaav: collection aur addDoc ko yahan import kiya hai logs ke liye
-    import { getFirestore, doc, getDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+    // 🛠️ Yahan humne addDoc ko hata kar setDoc aur doc ko sahi se rkh liya hai
+    import { getFirestore, doc, getDoc, collection, setDoc } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBJX_dyLK80p2rNqSVvGY67TpWV7e_UdPI",
@@ -49,16 +49,26 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // 🕒 Attendance Log save karne ka function
+    // 🕒 Attendance Log save karne ka naya function (Custom ID: Roll_Date_Time)
     async function saveLoginLog(rollNumber, studentName) {
         try {
-            await addDoc(collection(db, "login_logs"), {
+            const now = new Date();
+            // Date format: DD-MM-YYYY
+            const formattedDate = now.toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" }).replace(/\//g, "-");
+            // Time format: HH-MM-SS (24-hour format)
+            const formattedTime = now.toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour12: false }).replace(/:/g, "-");
+            
+            // Custom ID bana rahe hain jaise: 2356_18-06-2026_22-45-10
+            const customDocID = `${rollNumber}_${formattedDate}_${formattedTime}`;
+
+            // setDoc se hum khud ki banayi hui Custom ID par data save karte hain
+            await setDoc(doc(db, "login_logs", customDocID), {
                 roll: rollNumber,
                 name: studentName,
-                loginTime: new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }), // Indian Standard Time
-                timestamp: new Date() // Firebase sorting ke liye useful
+                loginTime: now.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }),
+                timestamp: now
             });
-            console.log("Attendance recorded successfully!");
+            console.log("Attendance recorded with Custom ID!");
         } catch (error) {
             console.error("Error recording attendance: ", error);
         }
@@ -84,10 +94,7 @@
             if (docSnap.exists()) {
                 let data = docSnap.data();
                 
-                // 🛠️ Database me "Password " ke piche space ka handle
                 let rawPassword = data["Password "] || data.Password || data["password "]; 
-                
-                // 🛠️ Database me "Name " ke piche space ka handle
                 let studentName = data["Name "] || data.Name || "Unknown Student";
                 
                 let dbPassword = String(rawPassword).trim();
@@ -99,12 +106,11 @@
                     
                     localStorage.setItem("studentRoll", roll);
                     
-                    // 📝 Dashboard par bhejne se pehle attendance database me save karein
+                    // Naye custom ID wale function ko call kiya
                     await saveLoginLog(roll, studentName);
                     
                     msg.innerHTML = "✅ Attendance Marked! Redirecting...";
 
-                    // Thoda rukh kar redirect karein taaki success msg aur data save dono ho jaye
                     setTimeout(() => {
                         window.location.href = "dashboard.html";
                     }, 1200);
@@ -117,7 +123,6 @@
                 msg.style.color = "red";
                 msg.innerHTML = "❌ Roll Number Not Found";
                 loginBtn.disabled = false;
-                
             }
         } catch (error) {
             console.error("Error: ", error);
