@@ -2,6 +2,9 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Gyan Varsha Coaching Center</title>
 
 <style>
@@ -56,15 +59,25 @@ color:white;
 }
 </style>
 <link rel="manifest" href="manifest.json">
-
 <meta name="theme-color" content="#083d77">
-
 <link rel="icon" href="logo.png">
-
 <link rel="apple-touch-icon" href="logo.png">
 </head>
   
 <body>
+
+  <script>
+    const activeRoll = localStorage.getItem("studentRoll");
+    
+    if (activeRoll) {
+        // Agar pehle se logged in hai, toh chupchaap dashboard par bhejo
+        window.location.href = "dashboard.html";
+    } else {
+        // Agar login nahi hai, toh turant login page par phenko
+        window.location.href = "student-login.html";
+    }
+  </script>
+
   <script>
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", function() {
@@ -83,30 +96,25 @@ if ("serviceWorker" in navigator) {
 <img src="logo.png" class="logo">
   
 <h1>📚 Gyan Varsha Coaching Center</h1>
-<p>Learn • Practice • Succeed</p><p style="background:white;
-color:#003366;
-padding:10px;
-border-radius:10px;
-font-weight:bold;
-margin-top:15px;">
+<p>Learn • Practice • Succeed</p>
+<p style="background:white; color:#003366; padding:10px; border-radius:10px; font-weight:bold; margin-top:15px;">
 ✨ हम वादा नहीं, पर दावा जरूर करते हैं ✨
-</p><p style="font-size:14px;">
+</p>
+<p style="font-size:14px;">
 सफलता की ओर आपका पहला कदम
-</p></div>
+</p>
+</div>
+
 <div class="container">
-
 <h2>Welcome Students</h2>
-<div style="background:white;
-padding:15px;
-border-radius:10px;
-margin-bottom:20px;
-box-shadow:0 2px 5px rgba(0,0,0,0.1);"><h3>📢 Latest Updates</h3><p>🕒 Next Live Class Available</p>
+<div style="background:white; padding:15px; border-radius:10px; margin-bottom:20px; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
+<h3>📢 Latest Updates</h3>
+<p>🕒 Next Live Class Available</p>
 <p>📚 Class 10 Maths Notes Added</p>
-<p>🏆 Latest Test Result Published</p></div>
+<p>🏆 Latest Test Result Published</p>
+</div>
 
-<a href="https://meet.google.com/iwb-mgyk-mpd"
-style="background:#28a745;color:white;padding:10px 20px;
-text-decoration:none;border-radius:8px;display:inline-block;">
+<a href="https://meet.google.com/iwb-mgyk-mpd" style="background:#28a745;color:white;padding:10px 20px; text-decoration:none;border-radius:8px;display:inline-block;">
 🎥 Join Live Class
 </a>
 <a class="btn" href="notes.html">📚 Notes</a>
@@ -114,12 +122,8 @@ text-decoration:none;border-radius:8px;display:inline-block;">
 <a class="btn" href="test.html">📝 Online Test</a>
 <a class="btn" href="day2.html">🚀 Day 2 Test</a>
 <a class="btn" href="result.html">📊 Result</a>
-<a class="btn" href="results.html">
-🚀 Day 1 Performers 🏆 
-</a>
-
+<a class="btn" href="results.html">🚀 Day 1 Performers 🏆</a>
 <a class="btn" href="https://wa.me/916203491210?text=Hii" target="_blank">📞 Contact Teacher</a>
-
 </div>
 
 <div class="footer">
