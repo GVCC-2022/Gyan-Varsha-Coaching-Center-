@@ -1,21 +1,25 @@
 {
-  "name": "GVCC Maths Mission",
+  "name": "Gyan Varsha Coaching Center",
   "short_name": "GVCC",
-  "start_url": "/gvcc/",
-  "scope": "/gvcc/",
+  "description": "Official Student Portal for Gyan Varsha Coaching Center, Hirauta, Sheohar.",
+  "start_url": "index.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#083d77",
-  "theme_color": "#083d77",
+  "background_color": "#f4f6f9",
+  "theme_color": "#003366",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "logo.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "logo.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
