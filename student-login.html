@@ -70,6 +70,9 @@
                 
                 let dbPassword = String(data.Password).trim();
                 let inputPassword = String(password).trim();
+                // Yeh line temporary check karne ke liye hai
+alert("DB Password: '" + dbPassword + "'\nInput Password: '" + inputPassword + "'");
+                
 
                 if (dbPassword === inputPassword) {
                     msg.style.color = "green";
