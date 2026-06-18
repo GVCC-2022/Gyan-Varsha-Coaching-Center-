@@ -118,7 +118,7 @@ docSnap.data();
 console.log("Firestore Data:", data);
 console.log("Firestore Password:", data.Password);
 console.log("Entered Password:", password);
-if(true){
+if(data.Password === password){
 
 localStorage.setItem(
 "studentRoll",
