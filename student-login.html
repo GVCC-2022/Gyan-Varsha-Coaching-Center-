@@ -1,125 +1,132 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GVCC Student Portal</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GVCC Student Portal</title>
 
-<style>
-body{
-font-family:Arial,sans-serif;
-background:#f4f6f9;
-text-align:center;
-padding:20px;
-}
+  <style>
+    body{
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+      text-align: center;
+      padding: 20px;
+      margin: 0;
+    }
 
-.box{
-background:white;
-padding:20px;
-border-radius:10px;
-max-width:350px;
-margin:auto;
-box-shadow:0 2px 5px rgba(0,0,0,0.2);
-}
+    .box{
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 350px;
+      margin: 40px auto;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
 
-input{
-width:90%;
-padding:10px;
-margin:10px 0;
-}
+    h1{
+      color: #003366;
+      margin-bottom: 20px;
+    }
 
-button{
-background:#007bff;
-color:white;
-padding:12px;
-border:none;
-border-radius:8px;
-width:95%;
-cursor:pointer;
-}
+    input{
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
 
-h1{
-color:#003366;
-}
+    button{
+      background: #007bff;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      width: 95%;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 8px;
+    }
 
-#msg{
-margin-top:10px;
-font-weight:bold;
-}
-</style>
+    button:active{
+      transform: scale(0.99);
+    }
 
+    #msg{
+      margin-top: 12px;
+      font-weight: bold;
+      min-height: 24px;
+    }
+  </style>
 </head>
 
 <body>
+  <div class="box">
+    <h1>🎓 Student Portal</h1>
 
-<div class="box">
+    <input type="text" id="roll" placeholder="Roll Number" />
+    <input type="password" id="password" placeholder="Password" />
 
-<h1>🎓 Student Portal</h1>
+    <button id="loginBtn" type="button">Login</button>
 
-<input type="text" id="roll" placeholder="Roll Number">
-<input type="password" id="password" placeholder="Password">
-<button id="loginBtn">Login</button> 
+    <p id="msg"></p>
+  </div>
 
-<p id="msg"></p>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
-</div>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBJX_dyLK80p2rNqSVvGY67TpWV7e_UdPI",
+      authDomain: "gvcc-database.firebaseapp.com",
+      projectId: "gvcc-database",
+      storageBucket: "gvcc-database.firebasestorage.app",
+      messagingSenderId: "1063216875940",
+      appId: "1:1063216875940:web:a4ee2f39b01896b44c5931"
+    };
 
-<script type="module">
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-import { initializeApp }
-from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+    document.getElementById("loginBtn").addEventListener("click", async () => {
+      const roll = document.getElementById("roll").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const msg = document.getElementById("msg");
 
-import {
-getFirestore,
-doc,
-getDoc
-}
-from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+      msg.innerHTML = "";
 
-const firebaseConfig = {
-apiKey: "AIzaSyBJX_dyLK80p2rNqSVvGY67TpWV7e_UdPI",
-authDomain: "gvcc-database.firebaseapp.com",
-projectId: "gvcc-database",
-storageBucket: "gvcc-database.firebasestorage.app",
-messagingSenderId: "1063216875940",
-appId: "1:1063216875940:web:a4ee2f39b01896b44c5931"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-// Button click listener module ke andar lagaya gaya hai
-document.getElementById("loginBtn").addEventListener("click", async function() {
-    alert("NEW CODE LOADED");
-      
-    let roll = document.getElementById("roll").value;
-    let password = document.getElementById("password").value;
-
-    // Validation check takiy khali submit na ho
-    if(!roll || !password) {
-        document.getElementById("msg").innerHTML = "⚠️ Please fill all fields";
+      if (!roll || !password) {
+        msg.innerHTML = "⚠️ Please fill all fields";
         return;
-    }
+      }
 
-    const docRef = doc(db, "students", roll);
-    const docSnap = await getDoc(docRef);
+      try {
+        const docRef = doc(db, "students", roll);
+        const docSnap = await getDoc(docRef);
 
-    if(docSnap.exists()){
-        let data = docSnap.data();
-        alert("DB=[" + data.Password.trim() + "] INPUT=[" + password.trim() + "]");
-
-        // Dhyan rakhein ki Firestore mein field ka naam "Password" (P capital) hi ho
-        if(data.Password.trim() === password.trim()){
-            localStorage.setItem("studentRoll", roll);
-            window.location.href = "dashboard.html";
-        } else {
-            document.getElementById("msg").innerHTML = "❌ Wrong Password";
+        if (!docSnap.exists()) {
+          msg.innerHTML = "❌ Roll Number Not Found";
+          return;
         }
-    } else {
-        document.getElementById("msg").innerHTML = "❌ Roll Number Not Found";
-    }
-});
 
-</script>
+        const data = docSnap.data();
 
+        const dbPassword = String(data.Password ?? data.password ?? "").trim();
+        const enteredPassword = String(password).trim();
+
+        if (dbPassword === enteredPassword) {
+          localStorage.setItem("studentRoll", roll);
+          localStorage.setItem("studentName", String(data.Name ?? data.name ?? "Student"));
+          localStorage.setItem("studentClass", String(data.Class ?? data.class ?? ""));
+          window.location.href = "dashboard.html";
+        } else {
+          msg.innerHTML = "❌ Wrong Password";
+        }
+      } catch (error) {
+        console.error(error);
+        msg.innerHTML = "❌ Error: " + error.message;
+      }
+    });
+  </script>
 </body>
 </html>
