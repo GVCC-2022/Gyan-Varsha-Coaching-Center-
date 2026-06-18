@@ -115,10 +115,7 @@ if(docSnap.exists()){
 let data =
 docSnap.data();
 
-console.log("Firestore Data:", data);
-console.log("Firestore Password:", data.Password);
-console.log("Entered Password:", password);
-alert("DB = [" + data.Password + "]  INPUT = [" + password + "]");
+alert(JSON.stringify(data));
   
 if(String(data.Password).trim() === String(password).trim()){
   
