@@ -55,17 +55,9 @@ font-weight:bold;
 
 <h1>🎓 Student Portal</h1>
 
-<input type="text"
-id="roll"
-placeholder="Roll Number">
-
-<input type="password"
-id="password"
-placeholder="Password">
-
-<button onclick="login()">
-Login
-</button>
+<input type="text" id="roll" placeholder="Roll Number">
+<input type="password" id="password" placeholder="Password">
+<button id="loginBtn">Login</button> 
 
 <p id="msg"></p>
 
@@ -95,55 +87,37 @@ appId: "1:1063216875940:web:a4ee2f39b01896b44c5931"
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-window.login = async function(){
-alert("NEW CODE LOADED");
-  
-let roll =
-document.getElementById("roll").value;
+// Button click listener module ke andar lagaya gaya hai
+document.getElementById("loginBtn").addEventListener("click", async function() {
+    alert("NEW CODE LOADED");
+      
+    let roll = document.getElementById("roll").value;
+    let password = document.getElementById("password").value;
 
-let password =
-document.getElementById("password").value;
+    // Validation check takiy khali submit na ho
+    if(!roll || !password) {
+        document.getElementById("msg").innerHTML = "⚠️ Please fill all fields";
+        return;
+    }
 
-const docRef =
-doc(db,"students",roll);
+    const docRef = doc(db, "students", roll);
+    const docSnap = await getDoc(docRef);
 
-const docSnap =
-await getDoc(docRef);
+    if(docSnap.exists()){
+        let data = docSnap.data();
+        alert("DB=[" + data.Password.trim() + "] INPUT=[" + password.trim() + "]");
 
-if(docSnap.exists()){
-
-let data =
-docSnap.data();
-alert(
-"DB=[" + data.Password.trim() +
-"] INPUT=[" + password.trim() + "]"
-);
-
-if(data.Password.trim() === password.trim()){
-
-localStorage.setItem(
-"studentRoll",
-roll
-);
-
-window.location.href =
-"dashboard.html";
-
-}else{
-
-document.getElementById("msg").innerHTML =
-"❌ Wrong Password";
-
-}
-
-}else{
-
-document.getElementById("msg").innerHTML =
-"❌ Roll Number Not Found";
-
-}
-
-}
+        // Dhyan rakhein ki Firestore mein field ka naam "Password" (P capital) hi ho
+        if(data.Password.trim() === password.trim()){
+            localStorage.setItem("studentRoll", roll);
+            window.location.href = "dashboard.html";
+        } else {
+            document.getElementById("msg").innerHTML = "❌ Wrong Password";
+        }
+    } else {
+        document.getElementById("msg").innerHTML = "❌ Roll Number Not Found";
+    }
+});
 
 </script>
 
