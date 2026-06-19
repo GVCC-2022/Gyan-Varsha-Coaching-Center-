@@ -1,63 +1,216 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Notice Board</title>
+<title>GVCC - Digital Notice Board</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
-body{
-font-family:Arial,sans-serif;
-background:#f4f6f9;
-margin:0;
-padding:0;
-}
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f4f6f9;
+        margin: 0;
+        padding: 0;
+        color: #1e293b;
+    }
+    
+    header {
+        background: linear-gradient(135deg, #002244, #003366);
+        color: white;
+        padding: 25px 15px;
+        text-align: center;
+        border-bottom-left-radius: 20px;
+        border-bottom-right-radius: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        position: relative;
+    }
 
-.header{
-background:#003366;
-color:white;
-text-align:center;
-padding:20px;
-}
+    header h1 { 
+        margin: 0; 
+        font-size: 22px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        gap: 10px; 
+    }
+    header p { margin: 5px 0 0 0; font-size: 13px; opacity: 0.8; }
 
-.notice{
-background:white;
-margin:15px;
-padding:15px;
-border-radius:10px;
-box-shadow:0 2px 5px rgba(0,0,0,0.1);
-}
+    .back-btn {
+        background: transparent;
+        border: none;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        position: absolute;
+        top: 25px;
+        left: 15px;
+    }
 
-h2{
-color:#003366;
-}
+    .container {
+        padding: 20px;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .section-title {
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #64748b;
+        margin-bottom: 15px;
+        font-weight: bold;
+    }
+
+    /* 🌟 Premium Notice Cards Layout */
+    .notice-card {
+        background: white;
+        padding: 18px 20px;
+        border-radius: 16px;
+        margin-bottom: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+        position: relative;
+        border-left: 5px solid #64748b; /* Default accent border */
+        transition: all 0.25s ease;
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+    }
+
+    .notice-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+    }
+
+    /* 🏷️ Smart Category Accent Colors */
+    .live-class-card { border-left-color: #28a745; }
+    .test-card { border-left-color: #ff9f43; }
+    .notes-card { border-left-color: #007bff; }
+    .result-card { border-left-color: #8e44ad; }
+
+    .notice-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 10px;
+    }
+
+    .notice-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0;
+        font-size: 16px;
+        font-weight: 700;
+        color: #003366;
+    }
+
+    .notice-title i { font-size: 18px; }
+    .live-class-card .notice-title i { color: #28a745; }
+    .test-card .notice-title i { color: #ff9f43; }
+    .notes-card .notice-title i { color: #007bff; }
+    .result-card .notice-title i { color: #8e44ad; }
+
+    /* ⏰ Mini Time Capsule Badge */
+    .time-badge {
+        background: #f1f5f9;
+        color: #64748b;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .notice-body {
+        font-size: 14px;
+        color: #475569;
+        line-height: 1.5;
+        margin: 5px 0 0 0;
+        text-align: left;
+    }
+
+    .notice-meta {
+        margin-top: 10px;
+        font-size: 13px;
+        color: #003366;
+        font-weight: 600;
+        background: #f8fafc;
+        padding: 6px 10px;
+        border-radius: 8px;
+        display: inline-block;
+        width: fit-content;
+    }
+
+    /* 🎯 Dynamic Action Links inside notices */
+    .notice-action {
+        margin-top: 12px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        color: #007bff;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: bold;
+        width: fit-content;
+        transition: gap 0.2s;
+    }
+    .notice-action:hover { gap: 8px; color: #0056b3; }
 </style>
 </head>
-
 <body>
 
-<div class="header">
-<h1>📢 Notice Board</h1>
-</div>
+<header>
+    <button class="back-btn" onclick="window.location.href='dashboard.html'">
+        <i class="fa-solid fa-arrow-left"></i>
+    </button>
+    <h1><i class="fa-solid fa-bullhorn" style="color: #ffc107;"></i> Notice Board</h1>
+    <p>Gyan Varsha Coaching Center Updates</p>
+</header>
 
-<div class="notice">
-<h2>🔴 Today's Live Class</h2>
-<p>Time: 11:00 AM</p>
-<p>Subject: Mathematics</p>
-</div>
+<div class="container">
+    <div class="section-title">Latest Announcements</div>
 
-<div class="notice">
-<h2>📝 Monthly Test</h2>
-<p>Date: Coming Soon</p>
-</div>
+    <div class="notice-card live-class-card">
+        <div class="notice-header">
+            <h3 class="notice-title"><i class="fa-solid fa-video"></i> Today's Live Class</h3>
+            <span class="time-badge">Today</span>
+        </div>
+        <p class="notice-body">Bacchon, aaj ki important mathematics live class thik schedule time par shuru hogi. Sabhi log timely login karein.</p>
+        <div class="notice-meta">⏰ Time: 11:00 AM | 📚 Subject: Mathematics</div>
+        <a href="https://meet.google.com/" target="_blank" class="notice-action">Join Stream Now <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
 
-<div class="notice">
-<h2>📚 New Notes Added</h2>
-<p>Class 10 Maths Formula Notes Available</p>
-</div>
+    <div class="notice-card test-card">
+        <div class="notice-header">
+            <h3 class="notice-title"><i class="fa-solid fa-pen-to-square"></i> Monthly Schedule Test</h3>
+            <span class="time-badge">2 days ago</span>
+        </div>
+        <p class="notice-body">Agla monthly evaluate test jaldi hi conduct kiya jayega. Syllabus revision poora rakhein.</p>
+        <div class="notice-meta">📅 Date: Coming Soon</div>
+    </div>
 
-<div class="notice">
-<h2>🏆 Latest Result</h2>
-<p>Class 9 History Monthly Test Result Published</p>
+    <div class="notice-card notes-card">
+        <div class="notice-header">
+            <h3 class="notice-title"><i class="fa-solid fa-book-bookmark"></i> New Study Material</h3>
+            <span class="time-badge">3 days ago</span>
+        </div>
+        <p class="notice-body">Class 10th ke mathematics subject ka Complete Formula Quick Revision sheet section upload kar diya gaya hai.</p>
+        <div class="notice-meta">📝 Content: Class 10 Maths Formula Sheet</div>
+        <a href="notesmenu.html" class="notice-action">Go to Notes Portal <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+
+    <div class="notice-card result-card">
+        <div class="notice-header">
+            <h3 class="notice-title"><i class="fa-solid fa-trophy"></i> Test Results Published</h3>
+            <span class="time-badge">1 week ago</span>
+        </div>
+        <p class="notice-body">Class 9th History Monthly evaluation ka final report aur result declare ho chuka hai. Rank score check karein.</p>
+        <div class="notice-meta">🏆 Event: Class 9 History Monthly Test</div>
+        <a href="result.html" class="notice-action">Check Score Rank <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
 </div>
 
 </body>
