@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Class 9 History Test - GVCC</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f4f6f9;
+        margin: 0;
+        padding: 0;
+        color: #1e293b;
+    }
+    .header {
+        background: linear-gradient(135deg, #002244, #003366);
+        color: white;
+        padding: 30px 15px;
+        text-align: center;
+        border-bottom-left-radius: 20px;
+        border-bottom-right-radius: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .header h1 { margin: 0; font-size: 22px; }
+    .header p { margin: 5px 0 0 0; font-size: 13px; opacity: 0.8; }
+    
+    .container { max-width: 480px; margin: 0 auto; padding: 15px; box-sizing: border-box; }
+    
+    .profile-lock-box {
+        background: white;
+        padding: 15px 20px;
+        border-radius: 14px;
+        margin-top: -15px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        display: flex;
+        gap: 15px;
+    }
+    .profile-field { flex: 1; }
+    .profile-field label { font-size: 11px; color: #64748b; font-weight: bold; text-transform: uppercase; }
+    .profile-field input {
+        width: 100%;
+        padding: 8px 0;
+        font-size: 15px;
+        font-weight: 600;
+        color: #003366;
+        border: none;
+        border-bottom: 2px solid #cbd5e1;
+        background: transparent;
+        outline: none;
+    }
+
+    .box {
+        background: white;
+        padding: 20px;
+        margin-top: 15px;
+        border-radius: 14px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+        border: 1px solid rgba(0,0,0,0.01);
+    }
+    .box p { margin: 0 0 15px 0; font-size: 15px; font-weight: 600; line-height: 1.4; color: #002244; }
+    
+    /* Premium Custom Radio Options */
+    .option-container {
+        display: block;
+        position: relative;
+        padding-left: 35px;
+        margin-bottom: 12px;
+        cursor: pointer;
+        font-size: 14px;
+        user-select: none;
+        color: #475569;
+    }
+    .option-container input { position: absolute; opacity: 0; cursor: pointer; }
+    .checkmark {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 20px;
+        width: 20px;
+        background-color: #f1f5f9;
+        border: 2px solid #cbd5e1;
+        border-radius: 50%;
+    }
+    .option-container:hover input ~ .checkmark { background-color: #e2e8f0; }
+    .option-container input:checked ~ .checkmark { background-color: #007bff; border-color: #007bff; }
+    .checkmark:after { content: ""; position: absolute; display: none; }
+    .option-container input:checked ~ .checkmark:after { display: block; }
+    .option-container .checkmark:after {
+        top: 6px; left: 6px; width: 8px; height: 8px;
+        border-radius: 50%; background: white;
+    }
+
+    .submit-btn {
+        background: #007bff;
+        color: white;
+        padding: 14px;
+        border: none;
+        border-radius: 12px;
+        width: 100%;
+        font-size: 16px;
+        font-weight: bold;
+        margin-top: 20px;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0,123,255,0.25);
+    }
+    .submit-btn:active { transform: scale(0.98); }
+
+    /* 🔐 Password Modal Styles */
+    .modal-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 34, 68, 0.85); backdrop-filter: blur(8px);
+        display: flex; align-items: center; justify-content: center; z-index: 1000;
+    }
+    .modal-box {
+        background: white; padding: 30px 24px; border-radius: 20px;
+        width: 85%; max-width: 360px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+    .modal-box i { font-size: 45px; color: #ff9f43; margin-bottom: 15px; }
+    .modal-box h3 { margin: 0 0 10px 0; color: #002244; font-size: 18px; }
+    .modal-box p { font-size: 13px; color: #64748b; margin: 0 0 20px 0; }
+    .modal-box input {
+        width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px;
+        font-size: 16px; text-align: center; letter-spacing: 4px; box-sizing: border-box; outline: none;
+    }
+    .modal-box input:focus { border-color: #007bff; }
+    .modal-box button {
+        background: #002244; color: white; border: none; padding: 12px;
+        width: 100%; border-radius: 10px; font-weight: bold; font-size: 15px; margin-top: 15px; cursor: pointer;
+    }
+
+    /* 📊 Glassmorphism Floating Result Screen */
+    .result-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(6px);
+        display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px; box-sizing: border-box;
+    }
+    .result-card {
+        background: rgba(255, 255, 255, 0.95); border-radius: 24px;
+        padding: 25px; width: 100%; max-width: 380px; text-align: center;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.5);
+    }
+    .badge-status {
+        display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px;
+        border-radius: 50px; font-weight: bold; font-size: 14px; margin-bottom: 15px;
+    }
+    .status-pass { background: #d1fae5; color: #065f46; }
+    .status-fail { background: #fee2e2; color: #991b1b; }
+    
+    .score-circle {
+        width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 15px auto;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        font-weight: bold; font-size: 24px; border: 6px solid #e2e8f0;
+    }
+</style>
+</head>
+<body>
+
+<!-- 🔐 Password Verification Popup -->
+<div class="modal-overlay" id="pwdModal">
+    <div class="modal-box">
+        <i class="fa-solid fa-shield-halved"></i>
+        <h3>Enter Test Password</h3>
+        <p>Aaj ke schedule test ka secure lock code daalein.</p>
+        <input type="password" id="testPassword" placeholder="••••" maxlength="6">
+        <button onclick="verifyPassword()">Unlock & Start Test</button>
+    </div>
+</div>
+
+<div class="header">
+    <h1>📚 Class 9 History Test</h1>
+    <p>Gyan Varsha Coaching Center</p>
+</div>
+
+<div class="container">
+    <!-- Profile Row Auto-Loaded -->
+    <div class="profile-lock-box">
+        <div class="profile-field">
+            <label>Student Name</label>
+            <input type="text" id="name" readonly value="Loading...">
+        </div>
+        <div class="profile-field" style="max-width: 100px;">
+            <label>Roll Number</label>
+            <input type="text" id="roll" readonly value="---">
+        </div>
+    </div>
+
+    <!-- Questions Block -->
+    <form id="testForm">
+        <div class="box">
+            <p>Q1. ट्रिपल एलायंस का गठन कब किया गया था?</p>
+            <label class="option-container">1782 <input type="radio" name="q1" value="0"><span class="checkmark"></span></label>
+            <label class="option-container">1883 <input type="radio" name="q1" value="0"><span class="checkmark"></span></label>
+            <label class="option-container">1983 <input type="radio" name="q1" value="0"><span class="checkmark"></span></label>
+            <label class="option-container">1882 <input type="radio" name="q1" value="1"><span class="checkmark"></span></label>
+        </div>
+
+        <div class="box">
+            <p>Q2. 1917 में कौन-सा देश प्रथम विश्व युद्ध से अलग हो गया?</p>
+            <label class="option-container">अमेरिका <input type="radio" name="q2" value="0"><span class="checkmark"></span></label>
+            <label class="option-container">जर्मनी <input type="radio" name="q2" value="0"><span class="checkmark"></span></label>
+            <label class="option-container">रूस <input type="radio" name="q2" value="1"><span class="checkmark"></span></label>
+            <label class="option-container">इटली <input type="radio" name="q2" value="0"><span class="checkmark"></span></label>
+        </div>
+    </form>
+
+    <button class="submit-btn" onclick="checkResult()">Submit Test</button>
+</div>
+
+<!-- 📊 Floating Glass App Result Card -->
+<div class="result-overlay" id="resultWindow">
+    <div class="result-card">
+        <div id="statusBadge" class="badge-status"></div>
+        <div class="score-circle" id="scoreCircle">00</div>
+        <h3 style="margin:5px 0; color:#002244;" id="resName">Student Name</h3>
+        <p style="margin:0 0 15px 0; font-size:13px; color:#64748b;">Roll No: <span id="resRoll">000</span></p>
+        
+        <div style="background:#f8fafc; padding:12px; border-radius:12px; font-size:14px; text-align:left; color:#475569; margin-bottom:20px;">
+            <div>📈 Percentage Accuracy: <strong id="resPercent" style="color:#002244;">0%</strong></div>
+            <div style="margin-top:4px;">🏫 Center: <strong>Gyan Varsha Coaching Center</strong></div>
+            <div style="margin-top:4px;">✍️ Prepared By: <strong>Md Faiyaz</strong></div>
+        </div>
+
+        <button id="waBtn" style="background:#25D366; color:white; border:none; padding:12px; width:100%; border-radius:12px; font-weight:bold; font-size:15px; display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer;">
+            <i class="fa-brands fa-whatsapp" style="font-size:20px;"></i> Send Score on WhatsApp
+        </button>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBJX_dyLK80p2rNqSVvGY67TpWV7e_UdPI",
+        authDomain: "gvcc-database.firebaseapp.com",
+        projectId: "gvcc-database",
+        storageBucket: "gvcc-database.firebasestorage.app",
+        messagingSenderId: "1063216875940",
+        appId: "1:1063216875940:web:a4ee2f39b01896b44c5931"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // 🔐 1. Set Password For Tomorrow's Test Here!
+    const CORRECT_TEST_PASSWORD = "1234"; // 👈 Yahan apna custom password change karein jab bhi test lena ho!
+
+    window.verifyPassword = function() {
+        let input = document.getElementById("testPassword").value;
+        if(input === CORRECT_TEST_PASSWORD) {
+            document.getElementById("pwdModal").style.display = "none";
+            loadStudentProfile();
+        } else {
+            alert("❌ Incorrect Test Password! Sahi code enter karein.");
+        }
+    }
+
+    // 👤 2. Auto Fetch Identity Profile from Firebase Storage
+    async function loadStudentProfile() {
+        let activeRoll = localStorage.getItem("studentRoll");
+        if(!activeRoll) {
+            window.location.href = "student-login.html";
+            return;
+        }
+        try {
+            const docRef = doc(db, "students", activeRoll);
+            const docSnap = await getDoc(docRef);
+            if(docSnap.exists()) {
+                let data = docSnap.data();
+                document.getElementById("name").value = data["Name "] || data.Name || "Unknown Student";
+                document.getElementById("roll").value = activeRoll;
+            }
+        } catch(e) {
+            console.error(e);
+        }
+    }
+
+    // 📊 3. Premium Scoring Calculation & UI Render
+    window.checkResult = function() {
+        let score = 0;
+        let totalQuestions = 2; // Abhi validation ke liye sirf 2 ques hain
+        
+        document.querySelectorAll('#testForm input[type=radio]:checked').forEach(e => {
+            score += Number(e.value);
+        });
+
+        let percent = (score / totalQuestions) * 100;
+        let isPassed = percent >= 60;
+
+        // Populate Result Pop-up UI
+        document.getElementById("resName").innerText = document.getElementById("name").value;
+        document.getElementById("resRoll").innerText = document.getElementById("roll").value;
+        document.getElementById("resPercent").innerText = percent.toFixed(0) + "%";
+        
+        let scoreCircle = document.getElementById("scoreCircle");
+        scoreCircle.innerText = score + "/" + totalQuestions;
+
+        let badge = document.getElementById("statusBadge");
+        if(isPassed) {
+            badge.className = "badge-status status-pass";
+            badge.innerHTML = "<i class='fa-solid fa-circle-check'></i> PASSED";
+            scoreCircle.style.borderColor = "#10b981";
+            scoreCircle.style.color = "#10b981";
+        } else {
+            badge.className = "badge-status status-fail";
+            badge.innerHTML = "<i class='fa-solid fa-circle-xmark'></i> NEEDS IMPROVEMENT";
+            scoreCircle.style.borderColor = "#ef4444";
+            scoreCircle.style.color = "#ef4444";
+        }
+
+        // WhatsApp Link Generator
+        document.getElementById("waBtn").onclick = function() {
+            let text = `📚 Gyan Varsha Coaching Center\n\n📝 Class 9 History Test Report\n👤 Name: ${document.getElementById("name").value}\n🆔 Roll No: ${document.getElementById("roll").value}\n🎯 Score: ${score}/${totalQuestions}\n📈 Percentage: ${percent.toFixed(0)}%\n📊 Result Status: ${isPassed ? 'PASS ✅' : 'FAIL ❌'}`;
+            window.open(`https://wa.me/916203491210?text=${encodeURIComponent(text)}`, '_blank');
+        };
+
+        // Open Card Modally
+        document.getElementById("resultWindow").style.display = "flex";
+    }
+</script>
+</body>
+</html>
