@@ -41,8 +41,7 @@
         font-weight: bold;
     }
 
-    /* 🌟 App-Style Premium Cards */
-    .subject-card, .chapter-card {
+    .subject-card {
         background: white;
         padding: 16px 20px;
         border-radius: 14px;
@@ -53,10 +52,10 @@
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
         cursor: pointer;
         transition: all 0.25s ease;
-        border-left: 5px solid #007bff; /* Left side premium accent line */
+        border-left: 5px solid #007bff;
     }
 
-    .subject-card:hover, .chapter-card:hover {
+    .subject-card:hover {
         transform: translateY(-2px);
         box-shadow: 0 6px 15px rgba(0, 123, 255, 0.1);
     }
@@ -85,7 +84,8 @@
     }
     .coming-soon i { color: #94a3b8; }
     .coming-soon h3 { color: #64748b; }
-    .coming-soon .badge {
+    
+    .badge {
         background: #e2e8f0;
         color: #64748b;
         padding: 4px 8px;
@@ -106,7 +106,7 @@
         margin-bottom: 10px;
     }
 
-    /* 🔒 Premium Password Modal Popup */
+    /* 🔒 Security Modal Popup */
     .modal {
         display: none;
         position: fixed;
@@ -148,10 +148,7 @@
     
     .modal-content input:focus { outline: none; border-color: #007bff; }
 
-    .modal-btns {
-        display: flex;
-        gap: 10px;
-    }
+    .modal-btns { display: flex; gap: 10px; }
 
     .m-btn {
         flex: 1;
@@ -168,25 +165,23 @@
 <body>
 
 <header>
-    <button class="back-btn" id="backBtn" style="display: none;" onclick="goBack()"><i class="fa-solid fa-arrow-left"></i> Back</button>
     <h1 id="headerTitle">📚 Student Notes Portal</h1>
     <p id="headerSub">Access your curated study materials</p>
 </header>
 
 <div class="container">
     <div id="subjectsView">
-        <div class="section-title">Your Subjects</div>
+        <div class="section-title" id="classDisplayTitle">Loading Class Info...</div>
         
-        <div class="subject-card" onclick="window.location.href='maths10.html'">
-    <div class="card-left">
-        <i class="fa-solid fa-compass-drafting"></i>
-        <div class="card-info">
-            <h3>Mathematics</h3>
+        <div class="subject-card" onclick="goToMathsNotes()">
+            <div class="card-left">
+                <i class="fa-solid fa-compass-drafting"></i>
+                <div class="card-info">
+                    <h3>Mathematics</h3>
+                </div>
+            </div>
+            <i class="fa-solid fa-chevron-right" style="color: #cbd5e1;"></i>
         </div>
-    </div>
-    <i class="fa-solid fa-chevron-right" style="color: #cbd5e1;"></i>
-</div>
-
 
         <div class="subject-card coming-soon">
             <div class="card-left">
@@ -208,101 +203,99 @@
             <span class="badge">Soon</span>
         </div>
     </div>
-
-    <!-- VIEW 2: CHAPTERS LIST (notesmenu.html ke andar) -->
-<div id="chaptersView" style="display: none;">
-    <div class="section-title">Select Chapter</div>
-    
-    <!-- 📄 Chapter 1 -->
-    <div class="chapter-card" onclick="openPDF('YOUR_CHAPTER_1_PDF_LINK_HERE')">
-        <div class="card-left">
-            <i class="fa-solid fa-file-pdf" style="color: #dc3545;"></i>
-            <div class="card-info">
-                <h3>Chapter 1 - Real Numbers</h3>
-            </div>
-        </div>
-        <i class="fa-solid fa-circle-check" style="color: #28a745;"></i> <!-- Premium Unlocked Icon -->
-    </div>
-
-    <!-- 🛠️ Sahi kiya gaya tag: <discriptv> ko hata kar sahi <div> lagaya -->
-    <!-- 📄 Chapter 2 -->
-    <div class="chapter-card" onclick="openPDF('YOUR_CHAPTER_2_PDF_LINK_HERE')">
-        <div class="card-left">
-            <i class="fa-solid fa-file-pdf" style="color: #dc3545;"></i>
-            <div class="card-info">
-                <h3>Chapter 2 - Polynomials</h3>
-            </div>
-        </div>
-        <i class="fa-solid fa-circle-check" style="color: #28a745;"></i> <!-- Premium Unlocked Icon -->
-    </div>
 </div>
 
-<!-- 🔐 Custom Unlock Modal Popup (Jo page load hote hi sabshe pehle aayega) -->
 <div class="modal" id="passModal">
     <div class="modal-content">
-        <i class="fa-solid fa-shield-halved" style="color: #007bff; font-size: 40px; margin-bottom: 10px;"></i>
+        <i class="fa-solid fa-shield-halved"></i>
         <h3>Unlock Notes Portal</h3>
         <p style="font-size: 13px; color: #64748b; margin: 0;">Gyan Varsha Coaching Center Security</p>
-        <input type="password" id="notesPassInput" placeholder="Enter Portal Password">
+        <input type="password" id="notesPassInput" placeholder="Enter Password">
         <div class="modal-btns">
-            <!-- Cancel karne par wapas dashboard bhej denge taaki bacha bina password security bypass na kare -->
             <button class="m-btn cancel" onclick="window.location.href='dashboard.html'">Go Back</button>
             <button class="m-btn confirm" onclick="verifyPassword()">Unlock Portal</button>
         </div>
     </div>
 </div>
 
-<script>
-    let selectedNotesLink = "";
-    // 🔑 Aapka purana secure password yahan set kar diya hai
-    const CORRECT_PASSWORD = "GVCC@437"; 
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
-    // 🚀 Page khulte hi sabshe pehle password ka modal popup automatic dikhega
+    const firebaseConfig = {
+        apiKey: "AIzaSyBJX_dyLK80p2rNqSVvGY67TpWV7e_UdPI",
+        authDomain: "gvcc-database.firebaseapp.com",
+        projectId: "gvcc-database",
+        storageBucket: "gvcc-database.firebasestorage.app",
+        messagingSenderId: "1063216875940",
+        appId: "1:1063216875940:web:a4ee2f39b01896b44c5931"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const CORRECT_PASSWORD = "GVCC@437";
+    let studentClass = "10th"; // Default fallback
+
+    // Page load hote hi password security maangna hai aur class check karni hai
     window.onload = function() {
         document.getElementById("passModal").style.display = "flex";
         document.getElementById("notesPassInput").focus();
+        fetchStudentClass();
     };
 
-    function verifyPassword() {
+    // 👤 Student Database se Live Class Fetch karne ka Logic
+    async function fetchStudentClass() {
+        let roll = localStorage.getItem("studentRoll");
+        if (roll) {
+            try {
+                const docRef = doc(db, "students", roll);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    let data = docSnap.data();
+                    // Firebase field check (Class ya class)
+                    let rawClass = data["Class "] || data.Class || data["class"] || "10th";
+                    studentClass = String(rawClass).trim().toLowerCase();
+                    
+                    // Display set karna
+                    document.getElementById("classDisplayTitle").innerText = `Your Subjects (Class: ${rawClass})`;
+                }
+            } catch (error) {
+                console.error("Error fetching class info:", error);
+                document.getElementById("classDisplayTitle").innerText = "Your Subjects";
+            }
+        } else {
+            document.getElementById("classDisplayTitle").innerText = "Your Subjects";
+        }
+    }
+
+    // Password verify logic
+    window.verifyPassword = function() {
         let inputPass = document.getElementById("notesPassInput").value.trim();
-        
         if(inputPass === CORRECT_PASSWORD) {
-            // ✅ Password sahi hone par popup band ho jayega aur bacha subjects dekh payega
             document.getElementById("passModal").style.display = "none";
         } else {
-            // ❌ Galat password hone par screen block ho jayegi
             document.body.innerHTML = `
                 <div style='text-align:center; margin-top:100px; font-family: sans-serif;'>
                     <h1 style='color:#dc3545;'>❌ Wrong Password</h1>
-                    <p style='color:#64748b; font-size:16px;'>Access Denied. Refresh the page to try again.</p>
+                    <p style='color:#64748b; font-size:16px;'>Access Denied. Refresh to try again.</p>
                 </div>`;
         }
     }
 
-    // 📐 Maths Chapters open karne ke liye function
-    function openMathsChapters() {
-        document.getElementById("subjectsView").style.display = "none";
-        document.getElementById("chaptersView").style.display = "block";
-        document.getElementById("backBtn").style.display = "flex";
-        document.getElementById("headerTitle").innerText = "📐 Class 10 Maths";
-        document.getElementById("headerSub").innerText = "Select chapter to view PDF";
+    // 🎯 Class ke hisab se routing button action (8th, 9th, 10th Teeno ke liye)
+window.goToMathsNotes = function() {
+    if (studentClass.includes("8") || studentClass.includes("8th")) {
+        window.location.href = "maths8.html";  // 👈 8th walo ke liye naya path
+    } 
+    else if (studentClass.includes("9") || studentClass.includes("9th")) {
+        window.location.href = "maths9.html";  // 👈 9th walo ke liye path
+    } 
+    else {
+        window.location.href = "maths10.html"; // 👈 10th walo ke liye path
     }
+}
 
-    // 🔙 Wapas Subjects par jaane ke liye
-    function goBack() {
-        document.getElementById("subjectsView").style.display = "block";
-        document.getElementById("chaptersView").style.display = "none";
-        document.getElementById("backBtn").style.display = "none";
-        document.getElementById("headerTitle").innerText = "📚 Student Notes Portal";
-        document.getElementById("headerSub").innerText = "Access your curated study materials";
-    }
-
-    // 📑 Jab bacha kisi chapter par click karega toh direct PDF khulegi
-    function openPDF(pdfUrl) {
-        // Yahan aap direct window.open ya location use kar sakte hain
-        window.location.href = pdfUrl; 
-    }
 </script>
-
 </body>
 </html>
