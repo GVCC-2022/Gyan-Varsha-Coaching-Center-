@@ -5,7 +5,6 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <title>GVCC - Live Test Portal</title>
     
-    <!-- FontAwesome & Glassmorphism Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -172,7 +171,6 @@
 </head>
 <body>
 
-    <!-- ⏳ Top Fixed Header (Shows Student Info & Dynamic Timer) -->
     <div class="test-header">
         <div>
             <div style="font-weight:700; font-size:14px;" id="headerStudentName">Loading...</div>
@@ -186,7 +184,6 @@
 
     <div class="main-container">
         
-        <!-- 🔒 Security Lock Panel (Asks for Password before loading test) -->
         <div id="lockSection" class="glass-panel">
             <h2><i class="fa-solid fa-lock"></i> Verification Required</h2>
             <p style="text-align:center; font-size:13px; color:#94a3b8; margin-bottom:20px;">Please enter the test password provided by Gyan Varsha Coaching Center.</p>
@@ -198,13 +195,11 @@
             <button class="btn-premium" onclick="verifyAndStartTest()">Unlock & Start Test</button>
         </div>
 
-        <!-- 📝 Live Test Section (Hidden initially) -->
         <div id="testSection" class="glass-panel" style="display:none;">
             <h2 id="testTitle">Class 9th History Test</h2>
             <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin-bottom:25px;">
 
             <form id="quizForm">
-                <!-- Question 1 -->
                 <div class="q-card">
                     <div class="q-text">1. हिन्द-चीन में बसने वाले फ्रांसीसी क्या कहे जाते थे?</div>
                     <label class="option-label"><input type="radio" name="q1" value="A"> फ्रांसीसी</label>
@@ -213,7 +208,6 @@
                     <label class="option-label"><input type="radio" name="q1" value="D"> जनरल</label>
                 </div>
 
-                <!-- Question 2 -->
                 <div class="q-card">
                     <div class="q-text">2. खोन्द विद्रोह कब और कहाँ हुआ था?</div>
                     <label class="option-label"><input type="radio" name="q2" value="A"> 1914, ओडिशा</label>
@@ -222,12 +216,11 @@
                     <label class="option-label"><input type="radio" name="q2" value="D"> 1915, गुजरात</label>
                 </div>
 
-                <!-- Question 3 -->
                 <div class="q-card">
                     <div class="q-text">3. अंकुरवाट का मन्दिर कहाँ स्थित है?</div>
                     <label class="option-label"><input type="radio" name="q3" value="A"> वियतनाम</label>
                     <label class="option-label"><input type="radio" name="q3" value="B"> थाईलैण्ड</label>
-                    <label class="option-label"><input type="radio" name="q3" value="C"> लाओस</label>
+                    <label class="option-label"><input type="radio" name="q3" value="C"> लाओas</label>
                     <label class="option-label"><input type="radio" name="q3" value="D"> कम्बोडिया</label>
                 </div>
 
@@ -236,7 +229,6 @@
         </div>
     </div>
 
-    <!-- 🏆 Premium Glassmorphism Result Modal -->
     <div id="resultModal" class="custom-modal">
         <div class="modal-content">
             <i class="fa-solid fa-circle-check" style="font-size:50px; color:#10b981;"></i>
@@ -250,7 +242,6 @@
         </div>
     </div>
 
-    <!-- Firebase Logic Integration -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
         import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
@@ -335,12 +326,40 @@
             }, 1000);
         }
 
-        // Anti-Cheat Engine (Background Activity Detection)
+        // 🔥 UPGRADED SUPER ANTI-CHEAT ENGINE (Pop-up, Notification aur Window Switch Sab Block)
         function activateAntiCheatSystem() {
+            // 1. Full Screen Force karna (Taki split screen ya dusra shortcut na chal sake)
+            try {
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen();
+                } else if (document.documentElement.webkitRequestFullscreen) { /* Safari */
+                    document.documentElement.webkitRequestFullscreen();
+                } else if (document.documentElement.msRequestFullscreen) { /* IE11 */
+                    document.documentElement.msRequestFullscreen();
+                }
+            } catch (e) { console.log("Fullscreen restriction skipped"); }
+
+            // 2. Full screen se bahar nikalne par tracker
+            document.addEventListener("fullscreenchange", () => {
+                if (!document.fullscreenElement && !hasSubmitted) {
+                    cheatCount++;
+                    alert(`🚨 SECURITY ALERT: Aapne Full Screen mode choda hai! Yeh cheating category mein aata hai.`);
+                }
+            });
+
+            // 3. Tab badalne par (Main Window switch alert)
             document.addEventListener("visibilitychange", () => {
                 if (document.hidden && !hasSubmitted) {
                     cheatCount++;
-                    alert(`🚨 WARNING: Aapne test window se switch kiya hai! Yeh cheating category mein aata hai. System admin ko iski update bhej di gayi hai.`);
+                    alert(`🚨 WARNING: Aapne test window se switch kiya hai! Yeh cheating category mein aata hai.`);
+                }
+            });
+
+            // 4. Notification Panel niche khinchne ya Pop-up chat window kholne par (Focus Lost Tracker)
+            window.addEventListener("blur", () => {
+                if (!hasSubmitted) {
+                    cheatCount++;
+                    alert(`🚨 CHEAT DETECTED: Shortcut menu ya drop-down panel open karne ki koshish pakdi gayi hai! Quietly tracked by GVCC.`);
                 }
             });
         }
@@ -350,6 +369,11 @@
             if (hasSubmitted) return;
             hasSubmitted = true;
             clearInterval(timerInterval);
+
+            // Exit full screen automatically upon submission
+            try {
+                if (document.exitFullscreen) document.exitFullscreen();
+            } catch(e) {}
 
             if (isTimeOut) {
                 alert("⏰ Time Over! Aapka 10 minute ka samay samapt ho gaya hai. Test automatically submit ho rha hai.");
@@ -367,7 +391,7 @@
             }
 
             let percentage = Math.round((score / totalQuestions) * 100);
-            let cheatStatusText = cheatCount > 0 ? `Detected (${cheatCount} Times App Switched)` : "Clean / No Cheating";
+            let cheatStatusText = cheatCount > 0 ? `Detected (${cheatCount} Times App Switched/Blurred)` : "Clean / No Cheating";
 
             // Prepare Student Subcollection Object for Firebase
             const recordPayload = {
