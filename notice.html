@@ -64,7 +64,6 @@
         font-weight: bold;
     }
 
-    /* 🌟 Premium Notice Cards Layout */
     .notice-card {
         background: white;
         padding: 18px 20px;
@@ -72,7 +71,7 @@
         margin-bottom: 16px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
         position: relative;
-        border-left: 5px solid #64748b; /* Default accent border */
+        border-left: 5px solid #64748b;
         transition: all 0.25s ease;
         display: flex;
         flex-direction: column;
@@ -84,7 +83,6 @@
         box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
     }
 
-    /* 🏷️ Smart Category Accent Colors */
     .live-class-card { border-left-color: #28a745; }
     .test-card { border-left-color: #ff9f43; }
     .notes-card { border-left-color: #007bff; }
@@ -113,7 +111,6 @@
     .notes-card .notice-title i { color: #007bff; }
     .result-card .notice-title i { color: #8e44ad; }
 
-    /* ⏰ Mini Time Capsule Badge */
     .time-badge {
         background: #f1f5f9;
         color: #64748b;
@@ -144,7 +141,7 @@
         width: fit-content;
     }
 
-    /* 🎯 Dynamic Action Links inside notices */
+    /* Dynamic Action Buttons */
     .notice-action {
         margin-top: 12px;
         display: flex;
@@ -155,6 +152,7 @@
         font-size: 13px;
         font-weight: bold;
         width: fit-content;
+        cursor: pointer;
         transition: gap 0.2s;
     }
     .notice-action:hover { gap: 8px; color: #0056b3; }
@@ -175,11 +173,11 @@
 
     <div class="notice-card live-class-card">
         <div class="notice-header">
-            <h3 class="notice-title"><i class="fa-solid fa-video"></i> Today's Live Class Nahi Hain ❌</h3>
-            <span class="time-badge">Today</span>
+            <h3 class="notice-title"><i class="fa-solid fa-video"></i> Today's Live Class</h3>
+            <span class="time-badge">🚫</span>
         </div>
-        <p class="notice-body">Bacchon, Abhi Lives Class nahi chal raha hain jis deen chalega Class me bol diya jaayega.</p>
-        <div class="notice-meta">⏰ Time: 11:00 AM | 📚 Subject: Mathematics</div>
+        <p class="notice-body">Abhi Live Class Band Hain Jis Deen Chalega Class Me bol diya Jayega. Okay Na👍.</p>
+        <div class="notice-meta">⏰ Time: 00:00 AM | 📚 Subject: Mathematics</div>
         <a href="https://meet.google.com/" target="_blank" class="notice-action">Join Stream Now <i class="fa-solid fa-arrow-right"></i></a>
     </div>
 
@@ -188,7 +186,7 @@
             <h3 class="notice-title"><i class="fa-solid fa-pen-to-square"></i> Monthly Schedule Test</h3>
             <span class="time-badge">2 days ago</span>
         </div>
-        <p class="notice-body">Agla monthly evaluate test jaldi hi conduct kiya jayega. Syllabus revision poora rakhein.</p>
+        <p class="notice-body">Agla monthly evaluate test jaldi hi conduct kiya jayega. Sabhi classes revision poora rakhein.</p>
         <div class="notice-meta">📅 Date: Coming Soon</div>
     </div>
 
@@ -197,9 +195,8 @@
             <h3 class="notice-title"><i class="fa-solid fa-book-bookmark"></i> New Study Material</h3>
             <span class="time-badge">3 days ago</span>
         </div>
-        <p class="notice-body">Class 10th ke mathematics subject ka Complete Formula Quick Revision sheet section upload kar diya gaya hai.</p>
-        <div class="notice-meta">📝 Content: Class 10 Maths Formula Sheet</div>
-        <a href="notesmenu.html" class="notice-action">Go to Notes Portal <i class="fa-solid fa-arrow-right"></i></a>
+        <p class="notice-body">Aapki class ka Mathematics subject ka New Chapter Quick Revision sheet upload kar diya gaya hai.</p>
+        <div class="notice-action" onclick="routeToNotes()">Go to My Notes Portal <i class="fa-solid fa-arrow-right"></i></div>
     </div>
 
     <div class="notice-card result-card">
@@ -207,11 +204,67 @@
             <h3 class="notice-title"><i class="fa-solid fa-trophy"></i> Test Results Published</h3>
             <span class="time-badge">1 week ago</span>
         </div>
-        <p class="notice-body">Class 9th History Monthly evaluation ka final report aur result declare ho chuka hai. Rank score check karein.</p>
-        <div class="notice-meta">🏆 Event: Class 9 History Monthly Test</div>
-        <a href="result.html" class="notice-action">Check Score Rank <i class="fa-solid fa-arrow-right"></i></a>
+        <p class="notice-body">Monthly test evaluation ka final score aur result declare ho chuka hai. Apni rank check karein.</p>
+        <div class="notice-action" onclick="routeToResult()">Check My Score Rank <i class="fa-solid fa-arrow-right"></i></div>
     </div>
 </div>
 
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBJX_dyLK80p2rNqSVvGY67TpWV7e_UdPI",
+        authDomain: "gvcc-database.firebaseapp.com",
+        projectId: "gvcc-database",
+        storageBucket: "gvcc-database.firebasestorage.app",
+        messagingSenderId: "1063216875940",
+        appId: "1:1063216875940:web:a4ee2f39b01896b44c5931"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    let studentClass = "10th"; // Fallback default
+
+    window.onload = function() {
+        fetchStudentClass();
+    };
+
+    // 👤 Firebase Database se login student ki class check karna
+    async function fetchStudentClass() {
+        let roll = localStorage.getItem("studentRoll");
+        if (roll) {
+            try {
+                const docRef = doc(db, "students", roll);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    let data = docSnap.data();
+                    let rawClass = data["Class "] || data.Class || data["class"] || "10th";
+                    studentClass = String(rawClass).trim().toLowerCase();
+                }
+            } catch (error) {
+                console.error("Error reading class path:", error);
+            }
+        }
+    }
+
+    // 🎯 1. Notes Smart Router
+    window.routeToNotes = function() {
+        // Direct password verification check wale custom menu par bhejenge
+        window.location.href = "notesmenu.html";
+    }
+
+    // 🎯 2. Result Smart Router
+    window.routeToResult = function() {
+        if (studentClass.includes("8")) {
+            window.location.href = "result8.html";   // 👈 8th ka result file
+        } else if (studentClass.includes("9")) {
+            window.location.href = "result9.html";   // 👈 9th ka result file
+        } else {
+            window.location.href = "result10.html";  // 👈 10th ka result file
+        }
+    }
+</script>
 </body>
 </html>
