@@ -61,16 +61,22 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.15);
         }
 
-        .logo {
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            background: white;
-            padding: 3px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            margin-bottom: 12px;
-            object-fit: cover;
-        }
+        ./* 🚀 Naya Transparent & Bada Logo Style */
+.logo {
+    width: 140px;                  /* 📐 Logo ka size bada kiya */
+    height: auto;                  /* 📐 Auto height taaki bacche ki photo side se na kate */
+    background: transparent;       /* ❌ Safed gol dabba poori tarah khatam */
+    border-radius: 0;              /* ❌ Gol cutting hatayi */
+    padding: 0;                    /* Extra space zero kiya */
+    margin-bottom: 15px;           /* Niche ke text se badhiya gap */
+    
+    /* 🌟 Dark blue header par logo ko khilane ke liye drop-shadow */
+    filter: drop-shadow(0px 6px 12px rgba(255, 255, 255, 0.15)) 
+            drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.3));
+            
+    display: inline-block;
+}
+
 
         header h1 {
             margin: 0;
