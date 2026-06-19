@@ -208,40 +208,45 @@
         </div>
     </div>
 
-    <div id="chaptersView" style="display: none;">
-        <div class="section-title">Select Chapter</div>
-        
-        <div class="chapter-card" onclick="askPassword('Chapter 1 Notes Link Here')">
-            <div class="card-left">
-                <i class="fa-solid fa-file-pdf" style="color: #dc3545;"></i>
-                <div class="card-info">
-                    <h3>Chapter 1 - Real Numbers</h3>
-                </div>
+    <!-- VIEW 2: CHAPTERS LIST (notesmenu.html ke andar) -->
+<div id="chaptersView" style="display: none;">
+    <div class="section-title">Select Chapter</div>
+    
+    <!-- 📄 Chapter 1 -->
+    <div class="chapter-card" onclick="openPDF('YOUR_CHAPTER_1_PDF_LINK_HERE')">
+        <div class="card-left">
+            <i class="fa-solid fa-file-pdf" style="color: #dc3545;"></i>
+            <div class="card-info">
+                <h3>Chapter 1 - Real Numbers</h3>
             </div>
-            <i class="fa-solid fa-lock" style="color: #a0aec0;"></i>
         </div>
+        <i class="fa-solid fa-circle-check" style="color: #28a745;"></i> <!-- Premium Unlocked Icon -->
+    </div>
 
-        <discriptv class="chapter-card" onclick="askPassword('Chapter 2 Notes Link Here')">
-            <div class="card-left">
-                <i class="fa-solid fa-file-pdf" style="color: #dc3545;"></i>
-                <div class="card-info">
-                    <h3>Chapter 2 - Polynomials</h3>
-                </div>
+    <!-- 🛠️ Sahi kiya gaya tag: <discriptv> ko hata kar sahi <div> lagaya -->
+    <!-- 📄 Chapter 2 -->
+    <div class="chapter-card" onclick="openPDF('YOUR_CHAPTER_2_PDF_LINK_HERE')">
+        <div class="card-left">
+            <i class="fa-solid fa-file-pdf" style="color: #dc3545;"></i>
+            <div class="card-info">
+                <h3>Chapter 2 - Polynomials</h3>
             </div>
-            <i class="fa-solid fa-lock" style="color: #a0aec0;"></i>
         </div>
+        <i class="fa-solid fa-circle-check" style="color: #28a745;"></i> <!-- Premium Unlocked Icon -->
     </div>
 </div>
 
+<!-- 🔐 Custom Unlock Modal Popup (Jo page load hote hi sabshe pehle aayega) -->
 <div class="modal" id="passModal">
     <div class="modal-content">
-        <i class="fa-solid fa-lock-open"></i>
-        <h3>Unlock Notes</h3>
-        <p style="font-size: 13px; color: #64748b; margin: 0;">Enter secure access token</p>
-        <input type="password" id="notesPassInput" placeholder="Enter Password">
+        <i class="fa-solid fa-shield-halved" style="color: #007bff; font-size: 40px; margin-bottom: 10px;"></i>
+        <h3>Unlock Notes Portal</h3>
+        <p style="font-size: 13px; color: #64748b; margin: 0;">Gyan Varsha Coaching Center Security</p>
+        <input type="password" id="notesPassInput" placeholder="Enter Portal Password">
         <div class="modal-btns">
-            <button class="m-btn cancel" onclick="closeModal()">Cancel</button>
-            <button class="m-btn confirm" onclick="verifyPassword()">Unlock</button>
+            <!-- Cancel karne par wapas dashboard bhej denge taaki bacha bina password security bypass na kare -->
+            <button class="m-btn cancel" onclick="window.location.href='dashboard.html'">Go Back</button>
+            <button class="m-btn confirm" onclick="verifyPassword()">Unlock Portal</button>
         </div>
     </div>
 </div>
