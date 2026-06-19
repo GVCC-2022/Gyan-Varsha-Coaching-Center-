@@ -3,329 +3,257 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <title>GVCC - Student Dashboard</title>
+    <title>GVCC - Live Test Portal</title>
     
-    <!-- 🎯 PWA Manifest Link -->
-    <link rel="manifest" href="manifest.json">
-    
-    <!-- FontAwesome for Premium Icons -->
+    <!-- FontAwesome & Glassmorphism Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
             --primary: #003366;
-            --secondary: #007bff;
+            --accent: #007bff;
             --success: #28a745;
             --danger: #dc3545;
-            --bg: #f8fafc;
-            --text-main: #1e293b;
+            --bg: #0f172a;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg);
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: #f8fafc;
             margin: 0;
             padding: 0;
-            color: var(--text-main);
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+            user-select: none; /* Prevents text copying */
         }
 
-        /* Loading Screen Styling */
-        #loading {
-            font-weight: bold;
-            color: #003366;
-            margin: 100px auto;
-            font-size: 18px;
-            text-align: center;
-        }
-
-        #mainContent {
-            display: none;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        /* Premium Header with Logo */
-        header {
-            background: linear-gradient(135deg, #002244, var(--primary));
-            color: white;
-            padding: 30px 15px 35px 15px;
-            text-align: center;
-            border-bottom-left-radius: 25px;
-            border-bottom-right-radius: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-        }
-
-        header .logo {
-            width: 130px !important;
-            max-width: 100% !important;
-            height: auto !important;
-            background: transparent !important; 
-            border-radius: 0 !important;   
-            padding: 0 !important;
-            margin: 0 auto 12px auto !important;
-            filter: drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.3))
-                    drop-shadow(0px 6px 12px rgba(255, 255, 255, 0.15));
-            display: inline-block !important;
-            object-fit: contain !important;
-        }
-
-        header h1 {
-            margin: 0;
-            font-size: 22px;
-            letter-spacing: 0.5px;
-        }
-
-        header p {
-            margin: 6px 0 14px 0;
-            font-size: 13px;
-            opacity: 0.8;
-        }
-
-        .slogan-tag {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.2);
-            padding: 6px 15px;
-            border-radius: 50px;
-            font-size: 12px;
-            display: inline-block;
-            font-weight: 500;
-        }
-
-        /* Main Container */
-        .container {
-            max-width: 450px;
-            width: 90%;
-            margin: -25px auto 30px auto;
-            flex: 1;
-        }
-
-        /* Profile Card */
-        .profile-card {
-            background: white;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            border: 1px solid rgba(0,0,0,0.02);
-            margin-bottom: 25px;
-        }
-
-        .profile-header {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border-bottom: 2px solid #f1f5f9;
-            padding-bottom: 8px;
-        }
-
-        .info-row {
+        /* Fixed Header with Timer */
+        .test-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 20px;
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
-            font-size: 14px;
-            border-bottom: 1px dashed #f1f5f9;
-        }
-        .info-row:last-child { border: none; }
-
-        .info-label { color: #64748b; font-weight: 500; }
-        .info-value { color: var(--text-main); font-weight: 600; }
-
-        /* Feature Grid System (2 Columns) */
-        .grid-menu {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .full-width {
-            grid-column: span 2;
-        }
-
-        /* Premium Dashboard Cards */
-        .menu-card {
-            background: white;
-            border: none;
-            border-radius: 14px;
-            padding: 18px 12px;
-            display: flex;
-            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            gap: 10px;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            transition: all 0.2s ease;
-            text-decoration: none;
+            z-index: 100;
         }
 
-        .menu-card i { font-size: 24px; }
-        .menu-card span { font-size: 14px; font-weight: 600; }
-
-        .card-live {
-            background: linear-gradient(135deg, #23d5ab, var(--success));
-            color: white;
-            flex-direction: row;
-            padding: 14px;
-        }
-        .card-live i { font-size: 20px; animation: pulse 1.5s infinite; }
-
-        .card-notes { color: #3b82f6; border-top: 4px solid #3b82f6; }
-        .card-notice { color: #f59e0b; border-top: 4px solid #f59e0b; }
-        .card-test { color: #ec4899; border-top: 4px solid #ec4899; }
-        .card-day2 { color: #8b5cf6; border-top: 4px solid #8b5cf6; }
-        .card-result { color: #10b981; border-top: 4px solid #10b981; }
-        .card-performer { color: #a855f7; border-top: 4px solid #a855f7; }
-
-        .menu-card:active {
-            transform: scale(0.95);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        .timer-box {
+            background: rgba(220, 53, 69, 0.2);
+            border: 1px solid var(--danger);
+            color: #fca5a5;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        .btn-logout {
+        /* Glassmorphism Lock & Form Containers */
+        .main-container {
+            max-width: 500px;
+            margin: 80px auto 40px auto;
+            width: 90%;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        h2 { text-align: center; color: #38bdf8; margin-top: 0; }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 13px;
+            color: #94a3b8;
+            margin-bottom: 6px;
+        }
+        .input-group input {
             width: 100%;
-            background: #ffe4e6;
-            color: var(--danger);
-            border: 1px solid #fecdd3;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
             padding: 12px;
-            border-radius: 12px;
+            border-radius: 10px;
+            color: white;
             font-size: 15px;
+            box-sizing: border-box;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .btn-premium {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent), #3b82f6);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
             font-weight: 600;
+            font-size: 16px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
             transition: all 0.2s;
         }
-        .btn-logout:active { background: #fecdd3; }
+        .btn-premium:active { transform: scale(0.98); }
 
-        footer {
-            background: #001529;
-            color: #94a3b8;
-            text-align: center;
-            padding: 15px;
-            font-size: 12px;
-            margin-top: auto;
-            border-top-left-radius: 15px;
-            border-top-right-radius: 15px;
+        /* Question Cards Styling */
+        .q-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 20px;
         }
-        footer p { margin: 4px 0; }
-        footer strong { color: white; }
+        .q-text {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 14px;
+            color: #e2e8f0;
+        }
+        .option-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.03);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: 0.2s;
+        }
+        .option-label:hover { background: rgba(255,255,255,0.06); }
+        .option-label input { accent-color: var(--accent); }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+        /* Custom Modern Modal for Results/Alerts */
+        .custom-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-content {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            padding: 30px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+        }
+
+        .score-badge {
+            font-size: 48px;
+            font-weight: 800;
+            color: #10b981;
+            margin: 15px 0;
         }
     </style>
 </head>
 <body>
 
-    <!-- Loading Screen -->
-    <div id="loading">
-        <i class="fa-solid fa-spinner fa-spin" style="font-size: 24px; color: #003366; margin-bottom: 10px;"></i>
-        <div>⏳ Securing Connection & Loading Profile...</div>
+    <!-- ⏳ Top Fixed Header (Shows Student Info & Dynamic Timer) -->
+    <div class="test-header">
+        <div>
+            <div style="font-weight:700; font-size:14px;" id="headerStudentName">Loading...</div>
+            <div style="font-size:11px; color:#94a3b8;">Roll: <span id="headerStudentRoll">--</span></div>
+        </div>
+        <div class="timer-box">
+            <i class="fa-solid fa-clock fa-pulse"></i>
+            <span id="countdownTimer">10:00</span>
+        </div>
     </div>
 
-    <!-- Main Content App Interface -->
-    <div id="mainContent">
-        <header>
-            <img src="logo.png" alt="GVCC Logo" class="logo">
-            <h1>Gyan Varsha Coaching Center</h1>
-            <p>Learn • Practice • Succeed</p>
-            <div class="slogan-tag">✨ हम वादा नहीं, पर दावा जरूर करते हैं ✨</div>
-        </header>
-
-        <div class="container">
-            <!-- Student Identity Card -->
-            <div class="profile-card">
-                <div class="profile-header">
-                    <i class="fa-solid fa-id-card"></i> 👤 Student Profile
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Name:</span>
-                    <span class="info-value" id="studentName">--</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Roll Number:</span>
-                    <span class="info-value" id="studentRollDisplay">--</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Class:</span>
-                    <span class="info-value" id="studentClass">--</span>
-                </div>
+    <div class="main-container">
+        
+        <!-- 🔒 Security Lock Panel (Asks for Password before loading test) -->
+        <div id="lockSection" class="glass-panel">
+            <h2><i class="fa-solid fa-lock"></i> Verification Required</h2>
+            <p style="text-align:center; font-size:13px; color:#94a3b8; margin-bottom:20px;">Please enter the test password provided by Gyan Varsha Coaching Center.</p>
+            
+            <div class="input-group">
+                <label>Test Activation Password</label>
+                <input type="password" id="testPassword" placeholder="••••••••">
             </div>
-
-            <!-- 2 Column Smart Grid Navigation -->
-            <div class="grid-menu">
-                <a href="https://meet.google.com/iwb-mgyk-mpd" class="menu-card card-live full-width" target="_blank">
-                    <i class="fa-solid fa-video"></i>
-                    <span>Join Live Class</span>
-                </a>
-
-                <!-- Notes Tile -->
-                <button class="menu-card card-notes" onclick="window.location.href='notesmenu.html'">
-                    <i class="fa-solid fa-book-open"></i>
-                    <span>Notes</span>
-                </button>
-
-                <!-- Notice Board Tile -->
-                <button class="menu-card card-notice" onclick="window.location.href='notice.html'">
-                    <i class="fa-solid fa-bullhorn"></i>
-                    <span>Notice Board</span>
-                </button>
-
-                <!-- 🛠️ Fix 1: Online Test Router Button Connected -->
-                <button class="menu-card card-test" onclick="routeToLiveTest()">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                    <span>Online Test</span>
-                </button>
-
-                <!-- Day 2 Test Tile -->
-                <button class="menu-card card-day2" onclick="window.location.href='day2.html'">
-                    <i class="fa-solid fa-rocket"></i>
-                    <span>Day 2 Test</span>
-                </button>
-
-                <!-- Result Tile -->
-                <button class="menu-card card-result" onclick="window.location.href='result.html'">
-                    <i class="fa-solid fa-chart-bar"></i>
-                    <span>Result</span>
-                </button>
-
-                <!-- Performers Tile -->
-                <button class="menu-card card-performer" onclick="window.location.href='results.html'">
-                    <i class="fa-solid fa-trophy"></i>
-                    <span>Day 1 Performers</span>
-                </button>
-            </div>
-
-            <button class="btn-logout" id="logoutBtn">
-                <i class="fa-solid fa-right-from-bracket"></i> Logout Securely
-            </button>
+            <button class="btn-premium" onclick="verifyAndStartTest()">Unlock & Start Test</button>
         </div>
 
-        <footer>
-            <p>📝 Created By: <strong>Md Faiyaz</strong></p>
-            <p>📍 Hirauta, Sheohar</p>
-            <p>© Gyan Varsha Coaching Center</p>
-        </footer>
+        <!-- 📝 Live Test Section (Hidden initially) -->
+        <div id="testSection" class="glass-panel" style="display:none;">
+            <h2 id="testTitle">Class 9th History Test</h2>
+            <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin-bottom:25px;">
+
+            <form id="quizForm">
+                <!-- Question 1 -->
+                <div class="q-card">
+                    <div class="q-text">1. हिन्द-चीन में बसने वाले फ्रांसीसी क्या कहे जाते थे?</div>
+                    <label class="option-label"><input type="radio" name="q1" value="A"> फ्रांसीसी</label>
+                    <label class="option-label"><input type="radio" name="q1" value="B"> शासक वर्ग</label>
+                    <label class="option-label"><input type="radio" name="q1" value="C"> कोलोन</label>
+                    <label class="option-label"><input type="radio" name="q1" value="D"> जनरल</label>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="q-card">
+                    <div class="q-text">2. खोन्द विद्रोह कब और कहाँ हुआ था?</div>
+                    <label class="option-label"><input type="radio" name="q2" value="A"> 1914, ओडिशा</label>
+                    <label class="option-label"><input type="radio" name="q2" value="B"> 1916, बंगाल</label>
+                    <label class="option-label"><input type="radio" name="q2" value="C"> 1910, बिहार</label>
+                    <label class="option-label"><input type="radio" name="q2" value="D"> 1915, गुजरात</label>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="q-card">
+                    <div class="q-text">3. अंकुरवाट का मन्दिर कहाँ स्थित है?</div>
+                    <label class="option-label"><input type="radio" name="q3" value="A"> वियतनाम</label>
+                    <label class="option-label"><input type="radio" name="q3" value="B"> थाईलैण्ड</label>
+                    <label class="option-label"><input type="radio" name="q3" value="C"> लाओस</label>
+                    <label class="option-label"><input type="radio" name="q3" value="D"> कम्बोडिया</label>
+                </div>
+
+                <button type="button" class="btn-premium" onclick="processSubmission(false)">Submit Answers</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 🏆 Premium Glassmorphism Result Modal -->
+    <div id="resultModal" class="custom-modal">
+        <div class="modal-content">
+            <i class="fa-solid fa-circle-check" style="font-size:50px; color:#10b981;"></i>
+            <h2 style="margin: 15px 0 5px 0; color:white;">Test Submitted!</h2>
+            <p style="color:#94a3b8; font-size:14px; margin-bottom:10px;">Your score has been successfully recorded in the main server.</p>
+            
+            <div class="score-badge" id="modalScore">0/3</div>
+            <p style="font-size:16px; font-weight:600; color:#38bdf8;" id="modalPercentage">0% Marks Obtained</p>
+            
+            <button class="btn-premium" style="margin-top:15px;" onclick="window.location.href='dashboard.html'">Back to Dashboard</button>
+        </div>
     </div>
 
     <!-- Firebase Logic Integration -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBJX_dyLK80p2rNqSVvGY67TpWV7e_UdPI",
@@ -339,62 +267,132 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Global Variable to store class data
-        let studentClassGlobal = "10th";
+        // Answer Key Setup
+        const correctAnswers = { q1: "C", q2: "A", q3: "D" };
+        
+        let timerInterval;
+        let totalTimeLeft = 600; // 10 Minutes in Seconds
+        let cheatCount = 0;
+        let hasSubmitted = false;
 
-        const activeRoll = localStorage.getItem("studentRoll");
-        if (!activeRoll) {
+        // Fetch Student Local Session Info
+        const currentRoll = localStorage.getItem("studentRoll");
+        if (!currentRoll) {
             window.location.href = "student-login.html";
-        } else {
-            fetchStudentData(activeRoll);
         }
 
-        async function fetchStudentData(roll) {
+        // Auto-fetch profile name on launch
+        async function loadProfileHeader() {
             try {
-                const docRef = doc(db, "students", roll);
+                const docRef = doc(db, "students", currentRoll);
                 const docSnap = await getDoc(docRef);
-
                 if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    let studentName = data["Name "] || data.Name || "N/A";
-                    let studentClass = data["Class "] || data.Class || "N/A";
-                    
-                    // 🛠️ Fix 2: Syncing class value for smart routing globally
-                    studentClassGlobal = String(studentClass).trim();
-                    
-                    document.getElementById("studentName").innerText = studentName;
-                    document.getElementById("studentRollDisplay").innerText = roll;
-                    document.getElementById("studentClass").innerText = studentClass + (String(studentClass).toLowerCase().includes('th') ? '' : 'th');
-                    
-                    document.getElementById("loading").style.display = "none";
-                    document.getElementById("mainContent").style.display = "flex";
-                } else {
-                    alert("Session Error: Profile not found.");
-                    logout();
+                    const sData = docSnap.data();
+                    const sName = sData["Name "] || sData.Name || "Student";
+                    document.getElementById("headerStudentName").innerText = sName;
+                    document.getElementById("headerStudentRoll").innerText = currentRoll;
+
+                    // 🔒 One-Time Lock Verification: Check if already submitted
+                    const testCheckRef = doc(db, "students", currentRoll, "tests", "history9_test");
+                    const testCheckSnap = await getDoc(testCheckRef);
+                    if (testCheckSnap.exists() && testCheckSnap.data().submitted === true) {
+                        alert("⚠️ Security Lock: Aap yeh test pehle hi de chuke hain! Dobara entry block hai.");
+                        window.location.href = "dashboard.html";
+                    }
                 }
-            } catch (error) {
-                console.error(error);
-                document.getElementById("loading").innerHTML = "<div style='color:red;'>⚠️ Connection timeout. Refresh the page.</div>";
-            }
+            } catch (err) { console.error(err); }
         }
+        loadProfileHeader();
 
-        // 🛠️ Fix 3: Global function linked properly to avoid loading crashes
-        window.routeToLiveTest = function() {
-            let cleanClass = String(studentClassGlobal).toLowerCase();
-            if (cleanClass.includes("8")) {
-                window.location.href = "maths8_test.html";
-            } else if (cleanClass.includes("9")) {
-                window.location.href = "history9.html";
+        // Password Verification & Test Init
+        window.verifyAndStartTest = function() {
+            const passInput = document.getElementById("testPassword").value.trim();
+            
+            // Set your master test password here (e.g., 'gvcc2026')
+            if (passInput === "gvcc2026") {
+                document.getElementById("lockSection").style.display = "none";
+                document.getElementById("testSection").style.display = "block";
+                startTestTimer();
+                activateAntiCheatSystem();
             } else {
-                window.location.href = "history10.html";
+                alert("❌ Galat Password! Please coaching administrator se sahi password lein.");
             }
         }
 
-        function logout() {
-            localStorage.removeItem("studentRoll");
-            window.location.href = "student-login.html";
+        // Continuous Counting Timer Engine
+        function startTestTimer() {
+            timerInterval = setInterval(() => {
+                if (totalTimeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    processSubmission(true); // Force Auto-Submit when time finishes
+                } else {
+                    totalTimeLeft--;
+                    let minutes = Math.floor(totalTimeLeft / 60);
+                    let seconds = totalTimeLeft % 60;
+                    document.getElementById("countdownTimer").innerText = 
+                        `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                }
+            }, 1000);
         }
-        document.getElementById("logoutBtn").addEventListener("click", logout);
+
+        // Anti-Cheat Engine (Background Activity Detection)
+        function activateAntiCheatSystem() {
+            document.addEventListener("visibilitychange", () => {
+                if (document.hidden && !hasSubmitted) {
+                    cheatCount++;
+                    alert(`🚨 WARNING: Aapne test window se switch kiya hai! Yeh cheating category mein aata hai. System admin ko iski update bhej di gayi hai.`);
+                }
+            });
+        }
+
+        // Database Score Upload & Submission Handler
+        window.processSubmission = async function(isTimeOut = false) {
+            if (hasSubmitted) return;
+            hasSubmitted = true;
+            clearInterval(timerInterval);
+
+            if (isTimeOut) {
+                alert("⏰ Time Over! Aapka 10 minute ka samay samapt ho gaya hai. Test automatically submit ho rha hai.");
+            }
+
+            // Calculate Scores
+            let score = 0;
+            const totalQuestions = Object.keys(correctAnswers).length;
+            const formData = new FormData(document.getElementById("quizForm"));
+
+            for (let q in correctAnswers) {
+                if (formData.get(q) === correctAnswers[q]) {
+                    score++;
+                }
+            }
+
+            let percentage = Math.round((score / totalQuestions) * 100);
+            let cheatStatusText = cheatCount > 0 ? `Detected (${cheatCount} Times App Switched)` : "Clean / No Cheating";
+
+            // Prepare Student Subcollection Object for Firebase
+            const recordPayload = {
+                score: `${score}/${totalQuestions}`,
+                percentage: `${percentage}%`,
+                submittedAt: new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }),
+                cheatStatus: cheatStatusText,
+                submitted: true
+            };
+
+            try {
+                // Save directly inside: students -> [Roll Number] -> tests -> history9_test
+                const testDocRef = doc(db, "students", currentRoll, "tests", "history9_test");
+                await setDoc(testDocRef, recordPayload, { merge: true });
+
+                // UI Presentation
+                document.getElementById("modalScore").innerText = `${score}/${totalQuestions}`;
+                document.getElementById("modalPercentage").innerText = `${percentage}% Marks Obtained`;
+                document.getElementById("resultModal").style.display = "flex";
+
+            } catch (error) {
+                console.error("Database Write Error: ", error);
+                alert("Submission Network Error! Take a screenshot of your screen right now.");
+            }
+        }
     </script>
 </body>
 </html>
