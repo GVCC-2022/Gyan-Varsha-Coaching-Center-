@@ -1,59 +1,292 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Notes Section</title>
-
+<title>GVCC - Student Notes Portal</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-body{
-font-family:Arial,sans-serif;
-background:#f4f6f9;
-text-align:center;
-margin:0;
-}
-.header{
-background:#003366;
-color:white;
-padding:20px;
-}
-.btn{
-display:block;
-background:#007bff;
-color:white;
-text-decoration:none;
-padding:15px;
-margin:12px auto;
-width:85%;
-max-width:300px;
-border-radius:10px;
-font-size:18px;
-font-weight:bold;
-}
-.footer{
-background:#003366;
-color:white;
-padding:15px;
-margin-top:30px;
-}
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f4f6f9;
+        margin: 0;
+        padding: 0;
+        color: #1e293b;
+    }
+    
+    header {
+        background: linear-gradient(135deg, #002244, #003366);
+        color: white;
+        padding: 25px 15px;
+        text-align: center;
+        border-bottom-left-radius: 20px;
+        border-bottom-right-radius: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    header h1 { margin: 0; font-size: 22px; }
+    header p { margin: 5px 0 0 0; font-size: 13px; opacity: 0.8; }
+
+    .container {
+        padding: 20px;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .section-title {
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #64748b;
+        margin-bottom: 15px;
+        font-weight: bold;
+    }
+
+    /* 🌟 App-Style Premium Cards */
+    .subject-card, .chapter-card {
+        background: white;
+        padding: 16px 20px;
+        border-radius: 14px;
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+        cursor: pointer;
+        transition: all 0.25s ease;
+        border-left: 5px solid #007bff; /* Left side premium accent line */
+    }
+
+    .subject-card:hover, .chapter-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(0, 123, 255, 0.1);
+    }
+
+    .card-left {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .card-left i {
+        font-size: 20px;
+        color: #007bff;
+    }
+
+    .card-info h3 {
+        margin: 0;
+        font-size: 16px;
+        color: #003366;
+    }
+
+    .coming-soon {
+        border-left-color: #94a3b8;
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+    .coming-soon i { color: #94a3b8; }
+    .coming-soon h3 { color: #64748b; }
+    .coming-soon .badge {
+        background: #e2e8f0;
+        color: #64748b;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: bold;
+    }
+
+    .back-btn {
+        background: transparent;
+        border: none;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+
+    /* 🔒 Premium Password Modal Popup */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.4);
+        backdrop-filter: blur(4px);
+        justify-content: center;
+        align-items: center;
+        z-index: 100;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 25px;
+        border-radius: 20px;
+        width: 85%;
+        max-width: 320px;
+        text-align: center;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    .modal-content i {
+        font-size: 35px;
+        color: #007bff;
+        margin-bottom: 15px;
+    }
+
+    .modal-content h3 { margin: 0 0 10px 0; color: #003366; }
+    
+    .modal-content input {
+        width: 90%;
+        padding: 12px;
+        margin: 15px 0;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 16px;
+        text-align: center;
+    }
+    
+    .modal-content input:focus { outline: none; border-color: #007bff; }
+
+    .modal-btns {
+        display: flex;
+        gap: 10px;
+    }
+
+    .m-btn {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 10px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .m-btn.cancel { background: #f1f5f9; color: #64748b; }
+    .m-btn.confirm { background: #007bff; color: white; }
 </style>
 </head>
 <body>
 
-<div class="header">
-<h1>📚 Notes Section</h1>
-<p>Select Your Class</p>
+<header>
+    <button class="back-btn" id="backBtn" style="display: none;" onclick="goBack()"><i class="fa-solid fa-arrow-left"></i> Back</button>
+    <h1 id="headerTitle">📚 Student Notes Portal</h1>
+    <p id="headerSub">Access your curated study materials</p>
+</header>
+
+<div class="container">
+    <div id="subjectsView">
+        <div class="section-title">Your Subjects</div>
+        
+        <div class="subject-card" onclick="openMathsChapters()">
+            <div class="card-left">
+                <i class="fa-solid fa-compass-drafting"></i>
+                <div class="card-info">
+                    <h3>Mathematics</h3>
+                </div>
+            </div>
+            <i class="fa-solid fa-chevron-right" style="color: #cbd5e1;"></i>
+        </div>
+
+        <div class="subject-card coming-soon">
+            <div class="card-left">
+                <i class="fa-solid fa-flask"></i>
+                <div class="card-info">
+                    <h3>Science</h3>
+                </div>
+            </div>
+            <span class="badge">Soon</span>
+        </div>
+        
+        <div class="subject-card coming-soon">
+            <div class="card-left">
+                <i class="fa-solid fa-book-open"></i>
+                <div class="card-info">
+                    <h3>English</h3>
+                </div>
+            </div>
+            <span class="badge">Soon</span>
+        </div>
+    </div>
+
+    <div id="chaptersView" style="display: none;">
+        <div class="section-title">Select Chapter</div>
+        
+        <div class="chapter-card" onclick="askPassword('Chapter 1 Notes Link Here')">
+            <div class="card-left">
+                <i class="fa-solid fa-file-pdf" style="color: #dc3545;"></i>
+                <div class="card-info">
+                    <h3>Chapter 1 - Real Numbers</h3>
+                </div>
+            </div>
+            <i class="fa-solid fa-lock" style="color: #a0aec0;"></i>
+        </div>
+
+        <div class="chapter-card" onclick="askPassword('Chapter 2 Notes Link Here')">
+            <div class="card-left">
+                <i class="fa-solid fa-file-pdf" style="color: #dc3545;"></i>
+                <div class="card-info">
+                    <h3>Chapter 2 - Polynomials</h3>
+                </div>
+            </div>
+            <i class="fa-solid fa-lock" style="color: #a0aec0;"></i>
+        </div>
+    </div>
 </div>
 
-<a class="btn" href="#">Class 6 (Coming Soon)</a>
-<a class="btn" href="#">Class 7 (Coming Soon)</a>
-<a class="btn" href="#">Class 8 (Coming Soon)</a>
-<a class="btn" href="#">Class 9 (Coming Soon)</a>
-
-<a class="btn" href="class10.html">🎓 Class 10</a>
-
-<div class="footer">
-© Gyan Varsha Coaching Center
+<div class="modal" id="passModal">
+    <div class="modal-content">
+        <i class="fa-solid fa-lock-open"></i>
+        <h3>Unlock Notes</h3>
+        <p style="font-size: 13px; color: #64748b; margin: 0;">Enter secure access token</p>
+        <input type="password" id="notesPassInput" placeholder="Enter Password">
+        <div class="modal-btns">
+            <button class="m-btn cancel" onclick="closeModal()">Cancel</button>
+            <button class="m-btn confirm" onclick="verifyPassword()">Unlock</button>
+        </div>
+    </div>
 </div>
 
+<script>
+    let selectedNotesLink = "";
+    const CORRECT_PASSWORD = "123"; // 🔑 Aapna password yahan set kijiye
+
+    function openMathsChapters() {
+        document.getElementById("subjectsView").style.display = "none";
+        document.getElementById("chaptersView").style.display = "block";
+        document.getElementById("backBtn").style.display = "flex";
+        document.getElementById("headerTitle").innerText = "📐 Class 10 Maths";
+        document.getElementById("headerSub").innerText = "Select chapter to unlock PDF";
+    }
+
+    function goBack() {
+        document.getElementById("subjectsView").style.display = "block";
+        document.getElementById("chaptersView").style.display = "none";
+        document.getElementById("backBtn").style.display = "none";
+        document.getElementById("headerTitle").innerText = "📚 Student Notes Portal";
+        document.getElementById("headerSub").innerText = "Access your curated study materials";
+    }
+
+    function askPassword(link) {
+        selectedNotesLink = link;
+        document.getElementById("passModal").style.display = "flex";
+        document.getElementById("notesPassInput").focus();
+    }
+
+    function closeModal() {
+        document.getElementById("passModal").style.display = "none";
+        document.getElementById("notesPassInput").value = "";
+    }
+
+    function verifyPassword() {
+        let inputPass = document.getElementById("notesPassInput").value.trim();
+        if(inputPass === CORRECT_PASSWORD) {
+            closeModal();
+            alert("🔒 Access Granted! Opening file: " + selectedNotesLink);
+            // window.location.href = selectedNotesLink; // Live system me ise on kar dena
+        } else {
+            alert("❌ Invalid Password! Please try again.");
+        }
+    }
+</script>
 </body>
 </html>
