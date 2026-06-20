@@ -286,7 +286,8 @@
         const canvas = document.getElementById('photoCanvas');
 
         // Fetch Student Local Session Info
-        const currentRoll = localStorage.getItem("studentRoll");
+        // अगर लोकल स्टोरेज में रोल नंबर नहीं है, तो टेस्टिंग के लिए "101" मान लेगा
+const currentRoll = localStorage.getItem("studentRoll") || "101"; 
         if (!currentRoll) {
             window.location.href = "student-login.html";
         }
