@@ -285,25 +285,24 @@
         const video = document.getElementById('proctorCam');
         const canvas = document.getElementById('photoCanvas');
 
-        // Fetch Student Local Session Info
-        // अगर लोकल स्टोरेज में रोल नंबर नहीं है, तो टेस्टिंग के लिए "101" मान लेगा
-const currentRoll = localStorage.getItem("studentRoll") || "101"; 
-        if (!currentRoll) {
-            window.location.href = "student-login.html";
-        }
+        // Fetch Student Local Session Info (अगर localstorage खाली है तो डिफ़ॉल्ट "student1" ले लेगा)
+        const currentRoll = localStorage.getItem("studentRoll") || "student1"; 
 
         // Auto-fetch profile name on launch
         async function loadProfileHeader() {
             try {
+                // पहले ही रोल नंबर यूआई में दिखा देते हैं ताकि खाली न दिखे
+                document.getElementById("headerStudentRoll").innerText = currentRoll;
+                document.getElementById("headerStudentName").innerText = "GVCC Student";
+
                 const docRef = doc(db, "students", currentRoll);
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
                     const sData = docSnap.data();
                     const sName = sData["Name "] || sData.Name || "Student";
                     document.getElementById("headerStudentName").innerText = sName;
-                    document.getElementById("headerStudentRoll").innerText = currentRoll;
 
-                    // 🔒 One-Time Lock Verification: Check if already submitted OR locked
+                    // 🔒 One-Time Lock Verification
                     const testCheckRef = doc(db, "students", currentRoll, "tests", "history9_test");
                     const testCheckSnap = await getDoc(testCheckRef);
                     if (testCheckSnap.exists() && testCheckSnap.data().submitted === true) {
@@ -311,7 +310,7 @@ const currentRoll = localStorage.getItem("studentRoll") || "101";
                         window.location.href = "dashboard.html";
                     }
                 }
-            } catch (err) { console.error(err); }
+            } catch (err) { console.error("Header Loading Error: ", err); }
         }
         loadProfileHeader();
 
@@ -324,7 +323,7 @@ const currentRoll = localStorage.getItem("studentRoll") || "101";
                 try {
                     const testDocRef = doc(db, "students", currentRoll, "tests", "history9_test");
                     await setDoc(testDocRef, { 
-                        submitted: true, // Agli baar login block karne ke liye
+                        submitted: true, 
                         cheatStatus: "Left Test Unfinished / App Closed without Submitting",
                         score: "0/3",
                         percentage: "0%",
@@ -342,9 +341,9 @@ const currentRoll = localStorage.getItem("studentRoll") || "101";
                     console.log("🔒 GVCC Camera Security System Active!");
                 } catch (err) {
                     console.error("Camera access denied: ", err);
-                    alert("⚠️ SECURITY REJECTION: Test dene ke liye background camera ki permission dena aniwarya (compulsory) hai!");
+                    alert("⚠️ SECURITY REJECTION: Test dene ke liye background camera ki permission dena compulsory hai!");
                     window.location.href = "dashboard.html";
-                    return; // Test code start nahi hoga agar camera fail hua
+                    return; 
                 }
 
                 isTestStarted = true;
@@ -365,7 +364,7 @@ const currentRoll = localStorage.getItem("studentRoll") || "101";
             timerInterval = setInterval(() => {
                 if (totalTimeLeft <= 0) {
                     clearInterval(timerInterval);
-                    processSubmission(true); // Force Auto-Submit when time finishes
+                    processSubmission(true); 
                 } else {
                     totalTimeLeft--;
                     let minutes = Math.floor(totalTimeLeft / 60);
@@ -378,13 +377,10 @@ const currentRoll = localStorage.getItem("studentRoll") || "101";
 
         // ⏱️ Automatic Photo Capture Scheduling
         function startAutomaticPhotoCapture() {
-            // Test 10 minutes ka hai, isliye hum har 3 minute (180000 ms) par ek photo lenge
-            // Taaki 10 minute ke andar aapke paas automatic 3 solid photos aa jayein.
             proctorInterval = setInterval(() => {
                 captureAndUploadSnapshot();
             }, 180000); 
             
-            // Ek photo test shuru hote hi turant click kar lega verification ke liye
             setTimeout(() => { captureAndUploadSnapshot(); }, 5000);
         }
 
@@ -397,30 +393,25 @@ const currentRoll = localStorage.getItem("studentRoll") || "101";
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
                 
-                // Draw current live frame onto hidden canvas
                 context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                
-                // Compress snapshot to small size Base64 text string (Quality: 50% to save student data)
                 const base64Image = canvas.toDataURL('image/jpeg', 0.5);
                 const timestamp = Date.now();
 
                 try {
-                    // Storing the image inside a modern dynamic sub-collection under student test history
                     const photoDocRef = doc(db, "students", currentRoll, "tests", "history9_test", "snapshots", `snap_${timestamp}`);
                     await setDoc(photoDocRef, {
                         capturedImage: base64Image,
                         capturedAt: new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
                     });
-                    console.log(`📸 Dynamic proctoring snap sent successfully at node: snap_${timestamp}`);
+                    console.log(`📸 Snap sent: snap_${timestamp}`);
                 } catch(e) {
-                    console.error("Failed to sync background image token: ", e);
+                    console.error("Image sync failed: ", e);
                 }
             }
         }
 
         // 🔥 UPGRADED SUPER ANTI-CHEAT ENGINE
         function activateAntiCheatSystem() {
-            // 1. Force Fullscreen
             try {
                 if (document.documentElement.requestFullscreen) {
                     document.documentElement.requestFullscreen();
@@ -429,7 +420,6 @@ const currentRoll = localStorage.getItem("studentRoll") || "101";
                 }
             } catch (e) { console.log("Fullscreen forced fail"); }
 
-            // 2. Fullscreen Exit Tracker
             document.addEventListener("fullscreenchange", () => {
                 if (!document.fullscreenElement && !hasSubmitted) {
                     cheatCount++;
@@ -437,17 +427,14 @@ const currentRoll = localStorage.getItem("studentRoll") || "101";
                 }
             });
 
-            // 3. Tab Switch Tracker (Visibility Change)
             document.addEventListener("visibilitychange", () => {
                 if (document.hidden && !hasSubmitted) {
                     cheatCount++;
-                    // Tab switch hote hi turant cheat-evidence photo khinch lo!
                     captureAndUploadSnapshot();
                     alert(`🚨 WARNING: Aapne test window se switch kiya hai! Yeh cheating category mein aata hai.`);
                 }
             });
 
-            // 4. Notification Panel/Pop-up Window Tracker (Focus Blur)
             window.addEventListener("blur", () => {
                 if (!hasSubmitted) {
                     cheatCount++;
@@ -455,7 +442,6 @@ const currentRoll = localStorage.getItem("studentRoll") || "101";
                 }
             });
 
-            // 5. Browser Back & Close Block Warning
             window.addEventListener("beforeunload", (e) => {
                 if (isTestStarted && !hasSubmitted) {
                     const msg = "🚨 WARNING: Aapka test chal rha hai! Agar aapne page choda toh aap block ho jayenge.";
@@ -465,12 +451,37 @@ const currentRoll = localStorage.getItem("studentRoll") || "101";
             });
         }
 
-        // Database Score Upload & Submission Handler
+        // Database Score Upload & Submission Handler (ये पार्ट अधूरा था जिसे पूरा कर दिया गया है)
         window.processSubmission = async function(isTimeOut = false) {
             if (hasSubmitted) return;
             hasSubmitted = true;
             
             clearInterval(timerInterval);
-            clearInterval(proctorInterval); // Stop capturing photos after test completes
+            clearInterval(proctorInterval); 
 
-            // Turn off camera lig
+            if (video.srcObject) {
+                video.srcObject.getTracks().forEach(track => track.stop());
+            }
+
+            try {
+                if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen();
+            } catch(e) {}
+
+            if (isTimeOut) {
+                alert("⏰ Time Over! Aapka 10 minute ka samay samapt ho gaya hai. Test automatically submit ho rha hai.");
+            }
+
+            let score = 0;
+            const totalQuestions = Object.keys(correctAnswers).length;
+            const formData = new FormData(document.getElementById("quizForm"));
+
+            for (let q in correctAnswers) {
+                if (formData.get(q) === correctAnswers[q]) {
+                    score++;
+                }
+            }
+
+            let percentage = Math.round((score / totalQuestions) * 100);
+            let cheatStatusText = cheatCount > 0 ? `Detected (${cheatCount} Times App Switched/Blurred)` : "Clean / No Cheating";
+
+            c
