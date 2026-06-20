@@ -5,7 +5,6 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <title>GVCC - Live Test Portal</title>
     
-    <!-- FontAwesome & Glassmorphism Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -172,7 +171,6 @@
 </head>
 <body>
 
-    <!-- ⏳ Top Fixed Header (Shows Student Info & Dynamic Timer) -->
     <div class="test-header">
         <div>
             <div style="font-weight:700; font-size:14px;" id="headerStudentName">Loading...</div>
@@ -184,13 +182,11 @@
         </div>
     </div>
 
-    <!-- 📸 Hidden Camera Elements for Proctoring -->
     <video id="proctorCam" autoplay playsinline style="display: none;"></video>
     <canvas id="photoCanvas" style="display: none;"></canvas>
 
     <div class="main-container">
         
-        <!-- 🔒 Security Lock Panel (Asks for Password before loading test) -->
         <div id="lockSection" class="glass-panel">
             <h2><i class="fa-solid fa-lock"></i> Verification Required</h2>
             <p style="text-align:center; font-size:13px; color:#94a3b8; margin-bottom:20px;">Please enter the test password provided by Gyan Varsha Coaching Center.</p>
@@ -202,13 +198,11 @@
             <button class="btn-premium" onclick="verifyAndStartTest()">Unlock & Start Test</button>
         </div>
 
-        <!-- 📝 Live Test Section (Hidden initially) -->
         <div id="testSection" class="glass-panel" style="display:none;">
             <h2 id="testTitle">Class 9th History Test</h2>
             <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin-bottom:25px;">
 
             <form id="quizForm">
-                <!-- Question 1 -->
                 <div class="q-card">
                     <div class="q-text">1. हिन्द-चीन में बसने वाले फ्रांसीसी क्या कहे जाते थे?</div>
                     <label class="option-label"><input type="radio" name="q1" value="A"> फ्रांसीसी</label>
@@ -217,7 +211,6 @@
                     <label class="option-label"><input type="radio" name="q1" value="D"> जनरल</label>
                 </div>
 
-                <!-- Question 2 -->
                 <div class="q-card">
                     <div class="q-text">2. खोन्द विद्रोह कब और कहाँ हुआ था?</div>
                     <label class="option-label"><input type="radio" name="q2" value="A"> 1914, ओडिशा</label>
@@ -226,7 +219,6 @@
                     <label class="option-label"><input type="radio" name="q2" value="D"> 1915, Gujarat</label>
                 </div>
 
-                <!-- Question 3 -->
                 <div class="q-card">
                     <div class="q-text">3. अंकुरवाट का मन्दिर कहाँ स्थित है?</div>
                     <label class="option-label"><input type="radio" name="q3" value="A"> वियतनाम</label>
@@ -240,7 +232,6 @@
         </div>
     </div>
 
-    <!-- 🏆 Premium Glassmorphism Result Modal -->
     <div id="resultModal" class="custom-modal">
         <div class="modal-content">
             <i class="fa-solid fa-circle-check" style="font-size:50px; color:#10b981;"></i>
@@ -254,7 +245,6 @@
         </div>
     </div>
 
-    <!-- Firebase Logic Integration -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
         import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
@@ -377,32 +367,47 @@
                 captureAndUploadSnapshot();
             }, 180000); // Takes photo every 3 minutes
             
-            setTimeout(() => { captureAndUploadSnapshot(); }, 5000); // Fast initial snap after 5 seconds
+            // Camera module stream settle hone ke liye 6 seconds ka delay diya hai taaki blank snapshot na aaye
+            setTimeout(() => { captureAndUploadSnapshot(); }, 6000); 
         }
 
         // 📸 Engine: Takes a background canvas snap and pushes to Firestore
         async function captureAndUploadSnapshot() {
             if (hasSubmitted || !video.srcObject) return;
 
-            const context = canvas.getContext('2d');
-            if (video.videoWidth > 0) {
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                const base64Image = canvas.toDataURL('image/jpeg', 0.5);
-                const timestamp = Date.now();
+            // Strict hardware ready check: camera jab tak data frame generate nahi karega, capture execute nahi hoga
+            if (video.readyState !== 4 || video.videoWidth === 0) {
+                console.log("📸 Camera data stream not ready yet. Retrying in 2 seconds...");
+                setTimeout(captureAndUploadSnapshot, 2000);
+                return;
+            }
 
-                try {
-                    const photoDocRef = doc(db, "students", currentRoll, "tests", "history9_test", "snapshots", `snap_${timestamp}`);
-                    await setDoc(photoDocRef, {
-                        capturedImage: base64Image,
-                        capturedAt: new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
-                    });
-                    console.log(`📸 Snap sent: snap_${timestamp}`);
-                } catch(e) {
-                    console.error("Image sync failed: ", e);
-                }
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Image data compress factor set to 0.7 for high structural preservation
+            const base64Image = canvas.toDataURL('image/jpeg', 0.7);
+
+            // Double confirmation check: string buffer size evaluate karna empty code filtering ke liye
+            if (base64Image.length < 200) {
+                console.log("⚠️ Structural verification failed (Blank Code String). Sync aborted.");
+                return;
+            }
+
+            const timestamp = Date.now();
+
+            try {
+                const photoDocRef = doc(db, "students", currentRoll, "tests", "history9_test", "snapshots", `snap_${timestamp}`);
+                await setDoc(photoDocRef, {
+                    capturedImage: base64Image,
+                    capturedAt: new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
+                });
+                console.log(`📸 Valid Base64 snap packet successfully transmitted: snap_${timestamp}`);
+            } catch(e) {
+                console.error("Image cloud sync failed: ", e);
             }
         }
 
