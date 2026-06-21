@@ -332,24 +332,25 @@
                     alert("⚠️ SYSTEM ALERT: Background camera access nahi mil saka. Kripya browser check karein, par aapka test chalu kar diya gaya hai.");
                 }
 
-                // Password ke andar jahan testDocRef set ho raha hai wahan check kijiye:
-try {
-    const testDocRef = doc(db, "tests", "history9_test", "students", currentRoll);
-    await setDoc(testDocRef, { 
-        submitted: false, 
-        cheatStatus: "Testing connection live",
-        score: "0/3",
-        percentage: "0%",
-        submittedAt: "Direct Sync Test Successful"
-    }, { merge: true });
-    
-    // Agar connection super hit hai toh yeh alert aayega:
-    alert("🚀 Boom! Connection successfully established with Cloud Firestore!");
-} catch(e) { 
-    alert("❌ Connection Fail Error: " + e.message); 
-}
-
-        }
+                // Temporary Connection Sync Test
+                try {
+                    const testDocRef = doc(db, "tests", "history9_test", "students", currentRoll);
+                    await setDoc(testDocRef, { 
+                        submitted: false, 
+                        cheatStatus: "Testing connection live",
+                        score: "0/3",
+                        percentage: "0%",
+                        submittedAt: "Direct Sync Test Successful"
+                    }, { merge: true });
+                    
+                    alert("🚀 Boom! Connection successfully established with Cloud Firestore!");
+                } catch(e) { 
+                    alert("❌ Connection Fail Error: " + e.message); 
+                }
+            } else {
+                alert("❌ Galat Password! Kripya sahi password enter karein.");
+            }
+        }; // FIXED: Yahan missing closing bracket add ho gaya hai!
 
         // Continuous Counting Timer Engine
         function startTestTimer() {
@@ -377,7 +378,7 @@ try {
             setTimeout(() => { captureAndUploadSnapshot(); }, 6000); 
         }
 
-                // 📸 Engine: Takes a background canvas snap and pushes to Firestore
+        // 📸 Engine: Takes a background canvas snap and pushes to Firestore
         async function captureAndUploadSnapshot() {
             if (hasSubmitted || !video.srcObject) return;
 
@@ -415,11 +416,9 @@ try {
                 console.log(`📸 Valid Base64 snap packet successfully transmitted for ${currentRoll}: snap_${timestamp}`);
             } catch(e) {
                 console.error("Image cloud sync failed: ", e);
-                // Mobile screen par error dekhne ke liye temporary alert (baad mein hata sakte hain)
                 alert("Firebase Error: " + e.message);
             }
         }
-
 
         // 🔥 ANTI-CHEAT ENGINE
         function activateAntiCheatSystem() {
@@ -487,7 +486,6 @@ try {
             document.getElementById("resultModal").style.display = "flex";
 
             try {
-                // FIX: Score submissions data ko bhi ab correct structural layout path par save kiya gaya hai
                 const testDocRef = doc(db, "tests", "history9_test", "students", currentRoll);
                 await setDoc(testDocRef, {
                     submitted: true,
