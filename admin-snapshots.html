@@ -79,17 +79,14 @@
         <p style="color: #94a3b8; font-size: 14px;">Class 9th History Test Live Evidence Viewer</p>
     </div>
 
-    <!-- 🔍 Search Bar to enter Student Roll Number -->
     <div class="search-box">
         <input type="text" id="studentRollInput" placeholder="Enter Student Roll (e.g. 902)">
         <button class="btn-search" onclick="fetchStudentSnapshots()">View Photos</button>
     </div>
 
-    <!-- 📸 Grid where photos will load automatically -->
     <div id="statusMessage" class="status-msg">Enter a roll number above to audit evidence.</div>
     <div class="gallery-grid" id="photoGallery"></div>
 
-    <!-- Firebase System Integration -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
         import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
@@ -116,17 +113,16 @@
                 return;
             }
 
-            // Clear previous results
             gallery.innerHTML = "";
             status.innerText = "Loading proctoring snapshots from main server...";
 
             try {
-                // Fetch snapshots sub-collection path dynamically
-                const snapCollectionRef = collection(db, "students", rollNo, "tests", "history9_test", "snapshots");
+                // FIXED PATH: tests -> history9_test -> students -> [rollNo] -> snapshots
+                const snapCollectionRef = collection(db, "tests", "history9_test", "students", rollNo, "snapshots");
                 const querySnapshot = await getDocs(snapCollectionRef);
 
                 if (querySnapshot.empty) {
-                    status.innerText = `No snapshots found for Roll Number: ${rollNo}. Either the camera was blocked or the test hasn't started.`;
+                    status.innerText = `No snapshots found for Roll Number: ${rollNo}.`;
                     return;
                 }
 
@@ -137,12 +133,10 @@
                     const base64ImageString = data.capturedImage;
                     const captureTime = data.capturedAt || "Unknown Time";
 
-                    // Create dynamic card structure
                     const card = document.createElement("div");
                     card.className = "photo-card";
 
                     const img = document.createElement("img");
-                    // directly setting the Base64 String to image source renders it perfectly on the screen
                     img.src = base64ImageString; 
                     img.alt = "Proctoring Log Snap";
 
