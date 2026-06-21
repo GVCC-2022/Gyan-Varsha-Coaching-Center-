@@ -332,21 +332,23 @@
                     alert("⚠️ SYSTEM ALERT: Background camera access nahi mil saka. Kripya browser check karein, par aapka test chalu kar diya gaya hai.");
                 }
 
-                try {
-                    // Sahi secure path par initial tracking set karna
-                    const testDocRef = doc(db, "tests", "history9_test", "students", currentRoll);
-                    await setDoc(testDocRef, { 
-                        submitted: false, 
-                        cheatStatus: "Left Test Unfinished / App Closed without Submitting",
-                        score: "0/3",
-                        percentage: "0%",
-                        submittedAt: "Incomplete Attempt"
-                    }, { merge: true });
-                } catch(e) { console.log("Lock deferred."); }
+                // Password ke andar jahan testDocRef set ho raha hai wahan check kijiye:
+try {
+    const testDocRef = doc(db, "tests", "history9_test", "students", currentRoll);
+    await setDoc(testDocRef, { 
+        submitted: false, 
+        cheatStatus: "Testing connection live",
+        score: "0/3",
+        percentage: "0%",
+        submittedAt: "Direct Sync Test Successful"
+    }, { merge: true });
+    
+    // Agar connection super hit hai toh yeh alert aayega:
+    alert("🚀 Boom! Connection successfully established with Cloud Firestore!");
+} catch(e) { 
+    alert("❌ Connection Fail Error: " + e.message); 
+}
 
-            } else {
-                alert("❌ Galat Password! Please coaching administrator se sahi password lein.");
-            }
         }
 
         // Continuous Counting Timer Engine
