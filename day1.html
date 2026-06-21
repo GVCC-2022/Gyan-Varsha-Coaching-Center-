@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Day 1 - Basic Maths Mission</title>
@@ -10,7 +10,7 @@
             text-align: center;
             margin: 0;
             padding: 0;
-            user-select: none;
+            user-select: none; /* Prevents text selection/copying */
         }
 
         .header {
@@ -30,10 +30,11 @@
             border-radius: 12px;
             max-width: 500px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            box-sizing: border-box;
         }
 
         input {
-            width: 90%;
+            width: 95%;
             padding: 12px;
             margin: 10px 0;
             font-size: 16px;
@@ -42,11 +43,9 @@
             box-sizing: border-box;
         }
 
-        /* Readonly inputs display styling */
         input:read-only {
             background-color: #e9ecef;
             color: #495057;
-            border: 1px solid #ced4da;
             cursor: not-allowed;
         }
 
@@ -77,6 +76,7 @@
         #waBtn {
             background: #25d366; color: white; padding: 12px; border-radius: 8px;
             text-decoration: none; font-weight: bold; display: none; margin-top: 15px;
+            text-align: center;
         }
 
         #result { margin-top: 20px; padding: 15px; border-radius: 8px; background: #e9ecef; }
@@ -86,7 +86,7 @@
             border: 3px solid #d9534f; border-radius: 12px; display: none;
             object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 1000;
         }
-        #msg { font-weight: bold; margin: 15px 0; font-size: 16px; }
+        #msg { font-weight: bold; margin: 15px 0; font-size: 16px; color: #d9534f; }
     </style>
 </head>
 <body>
@@ -97,20 +97,25 @@
 </div>
 
 <div class="box">
-    <!-- Login Section (Roll and Name are now auto-filled and locked) -->
-    <div id="loginSection">
+    <!-- Verification View Loader Section -->
+    <div id="authLoader">
+        <p style="color: #003366; font-weight: bold;">🔄 Verifying Student Profile from Database...</p>
+    </div>
+
+    <!-- Main Entry Input Portal -->
+    <div id="loginSection" style="display:none;">
         <input type="text" id="roll" placeholder="Roll Number" readonly>
         <input type="text" id="name" placeholder="Student Name" readonly>
         <input type="password" id="password" placeholder="Enter Day 1 Password">
         <button id="startBtn" onclick="startMission()">🚀 Start Day 1</button>
     </div>
 
-    <!-- Test Area -->
+    <!-- Active Live Test Interface -->
     <h2 id="timer" style="display:none;">⏰ 15:00</h2>
     <div id="questions"></div>
 
-    <button id="submitBtn" onclick="checkResult()" style="display:none;">📝 Submit Test</button>
-    <a id="waBtn" target="_blank" href="#">📲 Send Result to Teacher</a>
+    <button id="submitBtn" onclick="checkDuplicity()" style="display:none;">📝 Submit Test</button>
+    <a id="waBtn" target="_blank" href="#">按 Send Result to Teacher</a>
     
     <div id="result"></div>
     <p id="msg"></p>
@@ -123,112 +128,65 @@
 </div>
 
 <script>
-let timerStarted = false;
+// --- ANTI-CHEAT & PROCTORING CONTROLS ---
 let warningCount = 0;
 let time = 900; 
 let testTimerInterval;
+let globalClass = "";
 
-// Security: Copy-Paste and Right-Click strict blocks
+// Security: Cut/Copy/Paste & Right-Click Strict Prevention
 document.addEventListener('contextmenu', event => event.preventDefault());
 document.addEventListener('keydown', (e) => {
-    if (e.ctrlKey && (e.key === 'c' || e.key === 'v' || e.key === 'u')) {
+    if (e.ctrlKey && (e.key === 'c' || e.key === 'v' || e.key === 'u' || e.key === 'I')) {
         e.preventDefault();
-        alert("❌ Security Alert: Actions Blocked!");
+        alert("❌ Security Alert: Cheating protection active!");
     }
 });
-
-let students = {
-    "801":"Anamika Kumari", "802":"Radhika Kumari", "803":"Sabrun Khatoon", "804":"Rubana Khatoon",
-    "805":"Zainab Parveen", "806":"Sabiya Khatoon", "807":"Fatima Khatoon", "808":"Farida Khatoon",
-    "809":"Sama Khatoon", "810":"Sahnuma Parveen", "811":"Musarrat Khatoon", "812":"Mamta Kumari",
-    "813":"Sonakshi Kumari", "814":"Md Ashika", "815":"Raji Alam", "816":"Subodh Kumar",
-    "817":"Radhe Krishna", "818":"Ansh Kumar", "819":"Md Salman", "820":"Sonali Kumari",
-    "901":"Prince Raj", "902":"Avinash Kumar", "903":"Shyam Kumar", "904":"Kajal Kumari",
-    "905":"Nuzhat Parveen", "906":"Sneha Kumari", "907":"Aditya Soni", "908":"Gautam Kumari",
-    "909":"Mamta Kumari", "910":"Priya Kumari", "911":"Muskan Khatoon", "912":"Abhishek Kumar",
-    "913":"Rahul Kumar", "914":"Saqib Ansari", "915":"Prince Kumar", "916":"Ritik Raushan",
-    "917":"Manish Kumar", "918":"Altamash", "919":"Pawan Kumar", "920":"Kanchan Kumari",
-    "921":"Puja Kunari", "922":"Uzma Khatoon", "923":"Naushin khatoon", "924":"Radhe Shyam",
-    "1001":"Aasmin Khatoon", "1002":"Saloni Kumari", "1003":"Anjali Kumari", "1004":"Nitam Kumari",
-    "1005":"Saniya Kumari", "1006":"Sajiya Parveen", "1007":"Rounak Parveen", "1008":"Rahnaz Khatoon",
-    "1009":"Mustara Khatoon", "1010":"Raziya Tabassum", "1011":"Ishrat Khatoon", "1012":"Rupa Kumari",
-    "1013":"Priyanshu Kumari", "1014":"Anu Kumari", "1015":"Shruti Kumari", "1016":"Shivani Kumari I",
-    "1017":"Shivani Kumari II", "1018":"Afsana Khatoon", "1019":"Kajal Kumari", "1020":"Priti Kumari",
-    "1021":"Md Noor Alam", "1022":"Sajan Kumar", "1023":"Pankaj Kumar", "2356":"Md Faiyaz"
-};
-
-const allowedStudents = [
-    "801", "804", "814", "902", "914", "911", "918", "813", "922", "905", "923", "924",
-    "1001","1002","1003","1004","1005","1006","1007","1008","1009","1010",
-    "1011","1012","1013","1014","1015","1016","1017","1018","1019","1020",
-    "1021","1022","1023","2356"
-];
-
-// --- AUTO RUN: Extract Roll from URL Parameters ---
-window.onload = function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlRoll = urlParams.get('roll');
-    
-    if(urlRoll) {
-        document.getElementById("roll").value = urlRoll;
-        document.getElementById("name").value = students[urlRoll] || "";
-    } else {
-        alert("❌ Error: Dashboard se sahi tarike se login karke aayein.");
-    }
-}
 
 function startMission(){
     let roll = document.getElementById("roll").value;
     let password = document.getElementById("password").value;
 
-    if(!roll || !students[roll]){
-        alert("❌ Login session mismatch or missing Roll Number!");
-        return;
-    }
     if(password !== "GVCCDAY1"){
-        alert("❌ Wrong Password");
+        alert("❌ Wrong Password! Admin dwara bataya gya aaj ka code dalein.");
         return;
     }
-    if(!allowedStudents.includes(roll)){
-        alert("❌ Aap Day 1 ke liye eligible nahi hain.");
-        return;
-    }
-    if(localStorage.getItem("day1_" + roll)){
+    if(localStorage.getItem("day1_submitted_" + roll)){
         alert("❌ Aap Day 1 Test pehle hi submit kar chuke hain.");
         return;
     }
 
-    // Capture Web Camera Stream
+    // Media Camera Activation Engine
     navigator.mediaDevices.getUserMedia({ video: true })
     .then(function(stream){
         document.getElementById("camera").style.display = "block";
         document.getElementById("camera").srcObject = stream;
-        setupTestLayout(roll);
+        setupTestLayout();
     })
     .catch(function(){
-        alert("❌ Camera Permission Required to start the test!");
+        alert("❌ Camera Permission Needed! Test dene ke liye camera on karna anivaryah hai.");
     });
 }
 
-function setupTestLayout(roll) {
+function setupTestLayout() {
     document.getElementById("loginSection").style.display = "none";
     document.getElementById("timer").style.display = "block";
     document.getElementById("submitBtn").style.display = "block";
-    document.getElementById("msg").innerHTML = "✅ Welcome " + students[roll];
+    document.getElementById("msg").innerHTML = "";
 
-    // Anti-Cheat: Tab Swapping detection monitor
+    // Security Monitoring: Real-time Tab Switching Protection
     document.addEventListener("visibilitychange", function(){
         if(document.hidden){
             warningCount++;
-            alert("⚠️ Warning " + warningCount + "/3: Tab change mat kijiye!");
+            alert("⚠️ Warning " + warningCount + "/3: Tab change mat kijiye! 3 bar se zyada karne par auto-submit ho jayega.");
             if(warningCount >= 3) {
-                alert("❌ Auto-Submitting test due to multiple cheating attempts!");
+                alert("❌ Systems Locked: Auto-Submitting test due to multiple tab changes.");
                 processResult();
             }
         }
     });
 
-    // 2 setup questions
+    // 1-2 Temporary setup math questions (Dynamic for all classes)
     document.getElementById("questions").innerHTML = `
         <h3>Q1. 36 + 48 = ?</h3>
         <input type="radio" name="q1" value="0"> 82<br>
@@ -257,8 +215,10 @@ function setupTestLayout(roll) {
     }, 1000);
 }
 
-function checkResult(){
+function checkDuplicity(){
     let roll = document.getElementById("roll").value;
+    
+    // Cross check firebase if student already submitted this day's quiz
     const q = window.query(
         window.collection(window.db, "results"),
         window.where("roll", "==", roll),
@@ -267,7 +227,7 @@ function checkResult(){
       
     window.getDocs(q).then((snapshot) => {
         if (!snapshot.empty) {
-            alert("❌ Aap pehle hi test submit kar chuke hain.");
+            alert("❌ Database record shows you have already submitted this test.");
             return;
         }
         processResult();
@@ -284,7 +244,7 @@ function processResult(){
     
     let score = 0;
     document.querySelectorAll('input[type=radio]:checked').forEach(e => score += Number(e.value));
-    localStorage.setItem("day1_" + roll, "submitted");
+    localStorage.setItem("day1_submitted_" + roll, "true");
 
     let totalQuestions = 2;
     let percent = (score / totalQuestions) * 100;
@@ -297,7 +257,7 @@ function processResult(){
     else medal = "📚 Needs Practice";
 
     document.getElementById("result").innerHTML = `
-        <h2>Result Saved!</h2>
+        <h2>Result Processed!</h2>
         <p>Score: ${score}/${totalQuestions}</p>
         <p>Percentage: ${percent.toFixed(0)}%</p>
         <h3>${status}</h3>
@@ -306,11 +266,13 @@ function processResult(){
 
     document.querySelectorAll('input[type="radio"]').forEach(e => e.disabled = true);
     document.getElementById("submitBtn").style.display = "none";
-    document.getElementById("msg").innerHTML = "Warnings: " + warningCount;
+    document.getElementById("msg").style.color = "#333";
+    document.getElementById("msg").innerHTML = "Total Warnings Triggered: " + warningCount;
 
     let msgText = `🧮 Gyan Varsha Basic Maths Mission Day 1%0A%0A` +
                   `Name: ${sName}%0A` +
                   `Roll No: ${roll}%0A` +
+                  `Class: ${globalClass}%0A` +
                   `Score: ${score}/${totalQuestions}%0A` +
                   `Percentage: ${percent.toFixed(0)}%%0A` +
                   `Result: ${status}%0A` +
@@ -325,9 +287,11 @@ function processResult(){
         document.getElementById("camera").style.display = "none";
     }
 
+    // Cloud Database Firestore Save Engine
     window.addDoc(window.collection(window.db, "results"), {
         name: sName,
         roll: roll,
+        class: globalClass,
         day: "day1",
         score: score,
         percentage: percent.toFixed(0),
@@ -336,15 +300,16 @@ function processResult(){
         result: status,
         date: new Date().toLocaleString()
     })
-    .then(() => console.log("Result Synced!"))
+    .then(() => console.log("Cloud Saved!"))
     .catch((error) => console.log("Error:", error));
 }
 </script>
 
 <script type="module">
+// --- FIRESTORE DATABASE VERIFICATION & RUNNER ---
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
 import {
-  getFirestore, collection, addDoc, getDocs, query, where
+  getFirestore, doc, getDoc, collection, addDoc, getDocs, query, where
 } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -353,8 +318,7 @@ const firebaseConfig = {
   projectId: "gvcc-database",
   storageBucket: "gvcc-database.firebasestorage.app",
   messagingSenderId: "1063216875940",
-  appId: "1:1063216875940:web:a4ee2f39b01896b44c5931",
-  measurementId: "G-DP808QLE7K"
+  appId: "1:1063216875940:web:a4ee2f39b01896b44c5931"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -366,6 +330,41 @@ window.collection = collection;
 window.getDocs = getDocs;
 window.query = query;
 window.where = where;
+
+// Auto profile checker on load
+window.addEventListener("DOMContentLoaded", async () => {
+    const activeRoll = localStorage.getItem("studentRoll");
+    
+    if(!activeRoll) {
+        document.getElementById("authLoader").innerHTML = "❌ Session Mismatch: Please login from dashboard first.";
+        return;
+    }
+
+    try {
+        const docRef = doc(db, "students", activeRoll);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            let sName = data["Name "] || data.Name || "N/A";
+            let sClass = data["Class "] || data.Class || "N/A";
+            
+            globalClass = String(sClass).trim();
+
+            // Set data to input fields
+            document.getElementById("roll").value = activeRoll;
+            document.getElementById("name").value = sName;
+            
+            document.getElementById("authLoader").style.display = "none";
+            document.getElementById("loginSection").style.display = "block";
+        } else {
+            document.getElementById("authLoader").innerHTML = "❌ Profile Error: Student record not found in database.";
+        }
+    } catch (error) {
+        console.error(error);
+        document.getElementById("authLoader").innerHTML = "⚠️ Cloud Network Timeout. Please refresh page.";
+    }
+});
 </script>
 </body>
 </html>
