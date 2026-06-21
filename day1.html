@@ -405,61 +405,104 @@
             }
         }
 
-        function activateAntiCheatSystem() {
-    // 1. Force Fullscreen Entry
+   function activateAntiCheatSystem() {
+    // 1. Fullscreen activation
     try {
         if (document.documentElement.requestFullscreen) {
             document.documentElement.requestFullscreen();
         } else if (document.documentElement.webkitRequestFullscreen) {
             document.documentElement.webkitRequestFullscreen();
         }
-    } catch (e) { console.log("Fullscreen entry forced pass"); }
+    } catch (e) { console.log("Fullscreen forced pass"); }
 
-    // 2. Strict Fullscreen Monitoring Loop (Har 3 second mein security check)
-    setInterval(() => {
-        if (!document.fullscreenElement && !document.webkitFullscreenElement && !hasSubmitted && isTestStarted) {
-            cheatCount++;
-            captureAndUploadSnapshot(); // System instantly takes photo proof!
-            alert(`🚨 SECURITY WARNING: Full Screen bypass detected! Warning Count: ${cheatCount}/3. Screen se chhedchhad mat kijiye.`);
-            
-            if(warningCount + cheatCount >= 3) {
-                alert("❌ Systems Locked: Auto-Submitting test due to multiple security violations.");
-                processSubmission();
-            }
-        }
-    }, 3000);
-
-    // 3. Tab Visibility Sensor (For minimized or switched app)
-    document.addEventListener("visibilitychange", () => {
-        if (document.hidden && !hasSubmitted) {
-            cheatCount++;
-            captureAndUploadSnapshot();
-            alert(`🚨 SECURITY ALERT: App switch ya hide kiya gya hai! Logs record ho rahe hain.`);
-            if(warningCount + cheatCount >= 3) { processSubmission(); }
+    // 2. Strict Hardware Back & Page Exit Blocker (Most Active Tool)
+    window.addEventListener('beforeunload', function (e) {
+        if (!hasSubmitted && isTestStarted) {
+            // Cancel the event as stated by the standard.
+            e.preventDefault();
+            // Chrome requires returnValue to be set.
+            e.returnValue = '⚠️ WARNING: Agar aapne test choda ya back dabaya toh aap series se BAHAR ho jayenge aur dubara test BLOCK ho jayega! Iski report Md Faiyaz ke paas ja rahi hai.';
+            return e.returnValue;
         }
     });
 
-    // 4. Notification Panel & Alert Pull Sensor (Aggressive Focus Loss Catcher)
+    // 3. Instant Invisible Cloud Blocker (Agar baccha exit kar hi jata hai)
+    window.addEventListener('pagehide', function () {
+        if (!hasSubmitted && isTestStarted) {
+            autoLockStudentOnExit("Zabardasti Back ya Test Window Exit kiya");
+        }
+    });
+
+    // 4. Strict Fullscreen Lock Checker (Har 2 Second)
+    setInterval(() => {
+        if (!document.fullscreenElement && !document.webkitFullscreenElement && !hasSubmitted && isTestStarted) {
+            cheatCount++;
+            captureAndUploadSnapshot();
+            alert(`⚠️ WARNING: Fullscreen se chhedchhad mat kijiye! Warning: ${cheatCount}/3. Iska information Md Faiyaz ke paas chala jayega.`);
+            
+            if(cheatCount >= 3) {
+                autoLockStudentOnExit("Detected 3+ Cheating/Fullscreen Violations");
+            }
+        }
+    }, 2000);
+
+    // 5. App Switch / Notification Center Drop Sensor
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden && !hasSubmitted && isTestStarted) {
+            cheatCount++;
+            captureAndUploadSnapshot();
+            alert(`🚨 SECURITY ALERT: Aapne window change kiya hai! Warning: ${cheatCount}/3. Dubara karne par block ho jayenge.`);
+            if(cheatCount >= 3) {
+                autoLockStudentOnExit("Tab Switched/Minimized Multiple Times");
+            }
+        }
+    });
+
+    // 6. Notification Bar Drop Panel Catcher
     window.addEventListener("blur", () => {
         if (!hasSubmitted && isTestStarted) {
             cheatCount++;
             captureAndUploadSnapshot();
-            console.log("🚨 Deep Check: Focus lost via status bar slide or overlay pop-up.");
-            
-            // Background check for automatic submit if flags limit crossed
-            if(warningCount + cheatCount >= 3) {
-                processSubmission();
+            console.log("Focus lost caught.");
+            if(cheatCount >= 3) {
+                autoLockStudentOnExit("Notification panel drop flag limit crossed");
             }
         }
     });
+               }
 
-    // 5. Page Hide Fallback Sensor
-    window.addEventListener("pagehide", () => {
-        if (!hasSubmitted && isTestStarted) {
-            captureAndUploadSnapshot();
+        async function autoLockStudentOnExit(reason) {
+    if (hasSubmitted) return;
+    hasSubmitted = true; // Double click validation prevent engine
+
+    clearInterval(timerInterval);
+    clearInterval(proctorInterval);
+
+    if (video.srcObject) {
+        video.srcObject.getTracks().forEach(track => track.stop());
+    }
+
+    // Direct Database Block Trigger
+    try {
+        const testDocRef = window.doc(window.db, "tests", "maths_day1", "students", currentRoll);
+        await window.setDoc(testDocRef, {
+            submitted: true, // Yeh true hote hi dubara entry block ho jayegi!
+            name: studentFetchedName,
+            class: studentFetchedClass,
+            score: "Disqualified/Auto-Submitted",
+            percentage: "0%",
+            cheatStatus: `❌ BLOCKED: ${reason}`,
+            submittedAt: new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
+        }, { merge: true });
+        
+        console.log("🔒 Student session has been successfully locked in server.");
+        alert("❌ Test Blocked! Aapne rules tode hain, aapki details Md Faiyaz ke paas bhej di gayi hain.");
+        window.location.href = 'dashboard.html';
+    } catch (err) {
+        console.error("Critical Cloud Save Fail: ", err);
+    }
         }
-    });
-}
+        
 
 
         window.processSubmission = async function(isTimeOut = false) {
