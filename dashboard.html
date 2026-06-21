@@ -60,18 +60,18 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.15);
         }
 
-                header .logo {
+        header .logo {
             width: auto !important;
-            max-width: 180px !important; /* Aap isko apne hisab se chota-bada kar sakte hain */
+            max-width: 180px !important;
             height: auto !important;
-            background: none !important; /* Black background hatane ke liye */
+            background: none !important;
             background-color: transparent !important;
             border-radius: 0 !important;   
             padding: 0 !important;
             margin: 0 auto 15px auto !important;
-            display: block !important; /* Ekdum center alignment ke liye */
-            object-fit: scale-down !important; /* Taki logo cut na ho aur full dikhe */
-            box-shadow: none !important; /* Purana heavy shadow hatane ke liye */
+            display: block !important;
+            object-fit: scale-down !important;
+            box-shadow: none !important;
         }
 
         header h1 {
@@ -153,7 +153,7 @@
 
         /* Premium Dashboard Cards */
         .menu-card {
-            background: white;
+            background: white !important; /* Force white background for all cards */
             border: none;
             border-radius: 14px;
             padding: 18px 12px;
@@ -172,7 +172,7 @@
         .menu-card span { font-size: 14px; font-weight: 600; }
 
         .card-live {
-            background: linear-gradient(135deg, #23d5ab, var(--success));
+            background: linear-gradient(135deg, #23d5ab, var(--success)) !important;
             color: white;
             flex-direction: row;
             padding: 14px;
@@ -182,7 +182,10 @@
         .card-notes { color: #3b82f6; border-top: 4px solid #3b82f6; }
         .card-notice { color: #f59e0b; border-top: 4px solid #f59e0b; }
         .card-test { color: #ec4899; border-top: 4px solid #ec4899; }
-        .card-day2 { color: #8b5cf6; border-top: 4px solid #8b5cf6; }
+        
+        /* 🛠️ Fix Applied: Fixed name from card-day2 to card-day1 and injected premium color rules */
+        .card-day1 { color: #8b5cf6; border-top: 4px solid #8b5cf6; }
+        
         .card-result { color: #10b981; border-top: 4px solid #10b981; }
         .card-performer { color: #a855f7; border-top: 4px solid #a855f7; }
 
@@ -240,7 +243,6 @@
     <!-- Main Content App Interface -->
     <div id="mainContent">
         <header>
-            <!-- GVCC Perfect Transparent Logo Code -->
 <!-- 🌟 GVCC PREMIUM STICKY FLOATING HEADER START 🌟 -->
 <div style="position: fixed !important; top: 0; left: 0; width: 100%; background: linear-gradient(135deg, #002244 0%, #003366 100%); height: 95px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 10000 !important; display: flex; align-items: center; padding-left: 100px;">
     
@@ -249,7 +251,7 @@
         <img src="20260620_144347.png" alt="GVCC Logo" style="width: 100px !important; height: auto !important; background: transparent !important; border: none !important; box-shadow: none !important;">
     </div>
     
-    <!-- 2. RIGHT SIDE: Title, Tagline, and Slogan (Added margin-left to push right) -->
+    <!-- 2. RIGHT SIDE: Title, Tagline, and Slogan -->
     <div style="display: flex; flex-direction: column; justify-content: center; text-align: left; margin-left: 20px !important;">
         <h1 style="margin: 0 !important; padding: 0 !important; color: #ffffff !important; font-size: 18px !important; font-weight: 700 !important; line-height: 1.2 !important; font-family: 'Segoe UI', sans-serif;">Gyan Varsha Coaching Center</h1>
         
@@ -305,13 +307,13 @@
                     <span>Notice Board</span>
                 </button>
 
-                <!-- 🛠️ Fix 1: Online Test Router Button Connected -->
+                <!-- Online Test Router Button Connected -->
                 <button class="menu-card card-test" onclick="routeToLiveTest()">
                     <i class="fa-solid fa-pen-to-square"></i>
                     <span>Online Test</span>
                 </button>
 
-                <!-- Day 2 Test Tile -->
+                <!-- Day 1 Test Tile -->
                 <button class="menu-card card-day1" onclick="window.location.href='day1.html'">
                     <i class="fa-solid fa-rocket"></i>
                     <span>Day 1 Test</span>
@@ -359,7 +361,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Global Variable to store class data
         let studentClassGlobal = "10th";
 
         const activeRoll = localStorage.getItem("studentRoll");
@@ -379,7 +380,6 @@
                     let studentName = data["Name "] || data.Name || "N/A";
                     let studentClass = data["Class "] || data.Class || "N/A";
                     
-                    // 🛠️ Fix 2: Syncing class value for smart routing globally
                     studentClassGlobal = String(studentClass).trim();
                     
                     document.getElementById("studentName").innerText = studentName;
@@ -398,7 +398,6 @@
             }
         }
 
-        // 🛠️ Fix 3: Global function linked properly to avoid loading crashes
         window.routeToLiveTest = function() {
             let cleanClass = String(studentClassGlobal).toLowerCase();
             if (cleanClass.includes("8")) {
