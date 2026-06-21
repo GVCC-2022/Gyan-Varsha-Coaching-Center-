@@ -315,7 +315,7 @@
                 document.getElementById("testSection").style.display = "block";
                 
                 isTestStarted = true;
-                alert("Debug Check: Roll number is " + currentRoll);
+               // alert("Debug Check: Roll number is " + currentRoll);
                 startTestTimer();
                 activateAntiCheatSystem();
 
@@ -343,7 +343,7 @@
                         submittedAt: "Direct Sync Test Successful"
                     }, { merge: true });
                     
-                    alert("🚀 Boom! Connection successfully established with Cloud Firestore!");
+                   // alert("🚀 Boom! Connection successfully established with Cloud Firestore!");
                 } catch(e) { 
                     alert("❌ Connection Fail Error: " + e.message); 
                 }
