@@ -408,28 +408,42 @@
    // Global variable control flag to prevent rapid alert queuing
 let isAlerting = false; 
 
-function activateAntiCheatSystem() {
+// Ek direct function browser ko wapas fullscreen me force karne ke liye
+function forceReturnToFullscreen() {
     try {
         if (document.documentElement.requestFullscreen) {
             document.documentElement.requestFullscreen();
         } else if (document.documentElement.webkitRequestFullscreen) {
             document.documentElement.webkitRequestFullscreen();
         }
-    } catch (e) { console.log("Fullscreen entry forced pass"); }
+    } catch (e) { 
+        console.log("Fullscreen restoration active"); 
+    }
+}
 
-    // 1. Strict Fullscreen Lock Checker (Har 2 Second - Fixed Alert Loop Trap)
+function activateAntiCheatSystem() {
+    // Shuruat me fullscreen force karein
+    forceReturnToFullscreen();
+
+    // 1. Strict Fullscreen Lock Checker (Har 2 Second - Loop Trap Fixed)
     setInterval(() => {
         if (!document.fullscreenElement && !document.webkitFullscreenElement && !hasSubmitted && isTestStarted) {
-            // Agar pehle se screen par alert khula hai, toh naya alert mat chalao!
             if (isAlerting) return; 
             
             isAlerting = true;
             cheatCount++; 
             captureAndUploadSnapshot();
             
+            // Live warning popup
             alert(`⚠️ WARNING: Fullscreen se chhedchhad mat kijiye! Warning: ${cheatCount}/3. Iska information Md Faiyaz ke paas chala jayega.`);
             
-            isAlerting = false; // Alert band hone ke baad hi agla check chalega
+            // 🚀 MAGIC FIX: OK dabate hi turant pehle fullscreen me wapas laao
+            forceReturnToFullscreen();
+            
+            // Browser ko setup hone ke liye 3 second ka pause do, tab tak naya alert nahi chalega
+            setTimeout(() => {
+                isAlerting = false; 
+            }, 3000);
             
             if(cheatCount >= 3) {
                 autoLockStudentOnExit("Detected 3+ Fullscreen Violations");
@@ -437,7 +451,7 @@ function activateAntiCheatSystem() {
         }
     }, 2000);
 
-    // 2. App Switch / Minimize Sensor (Fixed with Alert Lock)
+    // 2. App Switch / Minimize Sensor
     document.addEventListener("visibilitychange", () => {
         if (document.hidden && !hasSubmitted && isTestStarted) {
             if (isAlerting) return;
@@ -448,7 +462,8 @@ function activateAntiCheatSystem() {
             
             alert(`🚨 SECURITY ALERT: Aapne window change kiya hai! Warning: ${cheatCount}/3. Dubara karne par block ho jayenge.`);
             
-            isAlerting = false;
+            forceReturnToFullscreen();
+            setTimeout(() => { isAlerting = false; }, 3000);
             
             if(cheatCount >= 3) {
                 autoLockStudentOnExit("Tab Switched/Minimized Multiple Times");
@@ -456,7 +471,7 @@ function activateAntiCheatSystem() {
         }
     });
 
-    // 3. Notification Bar Slide Sensor (Fixed with Alert Lock)
+    // 3. Notification Bar Slide Sensor
     window.addEventListener("blur", () => {
         if (!hasSubmitted && isTestStarted) {
             if (isAlerting) return;
@@ -467,7 +482,8 @@ function activateAntiCheatSystem() {
             
             alert(`⚠️ DISTRACTION DETECTED: Notification slide ya overlay panel touch kiya gaya hai! Warning: ${cheatCount}/3.`);
             
-            isAlerting = false;
+            forceReturnToFullscreen();
+            setTimeout(() => { isAlerting = false; }, 3000);
             
             if(cheatCount >= 3) {
                 autoLockStudentOnExit("Notification panel drop flag limit crossed");
