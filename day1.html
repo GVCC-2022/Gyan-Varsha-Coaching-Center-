@@ -405,7 +405,9 @@
             }
         }
 
-   // --- ANTI-CHEAT ENGINE (FIXED COUNTERS) ---
+   // Global variable control flag to prevent rapid alert queuing
+let isAlerting = false; 
+
 function activateAntiCheatSystem() {
     try {
         if (document.documentElement.requestFullscreen) {
@@ -415,12 +417,19 @@ function activateAntiCheatSystem() {
         }
     } catch (e) { console.log("Fullscreen entry forced pass"); }
 
-    // 1. Strict Fullscreen Lock Checker (Har 2 Second)
+    // 1. Strict Fullscreen Lock Checker (Har 2 Second - Fixed Alert Loop Trap)
     setInterval(() => {
         if (!document.fullscreenElement && !document.webkitFullscreenElement && !hasSubmitted && isTestStarted) {
+            // Agar pehle se screen par alert khula hai, toh naya alert mat chalao!
+            if (isAlerting) return; 
+            
+            isAlerting = true;
             cheatCount++; 
             captureAndUploadSnapshot();
+            
             alert(`⚠️ WARNING: Fullscreen se chhedchhad mat kijiye! Warning: ${cheatCount}/3. Iska information Md Faiyaz ke paas chala jayega.`);
+            
+            isAlerting = false; // Alert band hone ke baad hi agla check chalega
             
             if(cheatCount >= 3) {
                 autoLockStudentOnExit("Detected 3+ Fullscreen Violations");
@@ -428,12 +437,18 @@ function activateAntiCheatSystem() {
         }
     }, 2000);
 
-    // 2. App Switch / Minimize Sensor
+    // 2. App Switch / Minimize Sensor (Fixed with Alert Lock)
     document.addEventListener("visibilitychange", () => {
         if (document.hidden && !hasSubmitted && isTestStarted) {
+            if (isAlerting) return;
+            
+            isAlerting = true;
             cheatCount++; 
             captureAndUploadSnapshot();
+            
             alert(`🚨 SECURITY ALERT: Aapne window change kiya hai! Warning: ${cheatCount}/3. Dubara karne par block ho jayenge.`);
+            
+            isAlerting = false;
             
             if(cheatCount >= 3) {
                 autoLockStudentOnExit("Tab Switched/Minimized Multiple Times");
@@ -441,14 +456,18 @@ function activateAntiCheatSystem() {
         }
     });
 
-    // 3. Notification Bar Slide Sensor (🚨 NOW FIXED WITH LIVE POP-UP)
+    // 3. Notification Bar Slide Sensor (Fixed with Alert Lock)
     window.addEventListener("blur", () => {
         if (!hasSubmitted && isTestStarted) {
+            if (isAlerting) return;
+            
+            isAlerting = true;
             cheatCount++; 
             captureAndUploadSnapshot();
             
-            // Ab background me chupke se nahi badhega, live warning popup aayega!
-            alert(`⚠️ DISTRACTION DETECTED: Notification slide ya overlay panel touch kiya gaya hai! Warning: ${cheatCount}/3. Iska data Md Faiyaz ke paas ja raha hai.`);
+            alert(`⚠️ DISTRACTION DETECTED: Notification slide ya overlay panel touch kiya gaya hai! Warning: ${cheatCount}/3.`);
+            
+            isAlerting = false;
             
             if(cheatCount >= 3) {
                 autoLockStudentOnExit("Notification panel drop flag limit crossed");
