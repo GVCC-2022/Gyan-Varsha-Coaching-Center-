@@ -284,19 +284,21 @@
             document.getElementById("headerStudentName").innerText = "GVCC Student";
 
             try {
+                // Pehle students main root se name fetch karo
                 const docRef = doc(db, "students", currentRoll);
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
                     const sData = docSnap.data();
                     const sName = sData["Name "] || sData.Name || "Student";
                     document.getElementById("headerStudentName").innerText = sName;
+                }
 
-                    const testCheckRef = doc(db, "students", currentRoll, "tests", "history9_test");
-                    const testCheckSnap = await getDoc(testCheckRef);
-                    if (testCheckSnap.exists() && testCheckSnap.data().submitted === true) {
-                        alert("⚠️ Security Lock: Aap yeh test pehle hi shuru ya submit kar chuke hain! Dobara entry block hai.");
-                        window.location.href = "dashboard.html";
-                    }
+                // Naye secure path par check karo ki kya student pehle hi test de chuka hai
+                const testCheckRef = doc(db, "tests", "history9_test", "students", currentRoll);
+                const testCheckSnap = await getDoc(testCheckRef);
+                if (testCheckSnap.exists() && testCheckSnap.data().submitted === true) {
+                    alert("⚠️ Security Lock: Aap yeh test pehle hi shuru ya submit kar chuke hain! Dobara entry block hai.");
+                    window.location.href = "dashboard.html";
                 }
             } catch (err) { 
                 console.error("Header Fetch Bypass: ", err); 
@@ -330,7 +332,8 @@
                 }
 
                 try {
-                    const testDocRef = doc(db, "students", currentRoll, "tests", "history9_test");
+                    // Sahi secure path par initial tracking set karna
+                    const testDocRef = doc(db, "tests", "history9_test", "students", currentRoll);
                     await setDoc(testDocRef, { 
                         submitted: false, 
                         cheatStatus: "Left Test Unfinished / App Closed without Submitting",
@@ -400,12 +403,13 @@
             const timestamp = Date.now();
 
             try {
-                const photoDocRef = doc(db, "students", currentRoll, "tests", "history9_test", "snapshots", `snap_${timestamp}`);
+                // FIX: Snapshots ko direct student ke collection ke under save kiya gaya hai
+                const photoDocRef = doc(db, "tests", "history9_test", "students", currentRoll, "snapshots", `snap_${timestamp}`);
                 await setDoc(photoDocRef, {
                     capturedImage: base64Image,
                     capturedAt: new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
                 });
-                console.log(`📸 Valid Base64 snap packet successfully transmitted: snap_${timestamp}`);
+                console.log(`📸 Valid Base64 snap packet successfully transmitted for ${currentRoll}: snap_${timestamp}`);
             } catch(e) {
                 console.error("Image cloud sync failed: ", e);
             }
@@ -424,7 +428,7 @@
             document.addEventListener("fullscreenchange", () => {
                 if (!document.fullscreenElement && !hasSubmitted) {
                     cheatCount++;
-                    alert(`🚨 SECURITY ALERT: Aapne Full Screen mode choda hai! Yeh cheating category mein aata hai.`);
+                    alert(`🚨 SECURITY ALERT: Aapने Full Screen mode choda hai! Yeh cheating category mein aata hai.`);
                 }
             });
 
@@ -477,7 +481,8 @@
             document.getElementById("resultModal").style.display = "flex";
 
             try {
-                const testDocRef = doc(db, "students", currentRoll, "tests", "history9_test");
+                // FIX: Score submissions data ko bhi ab correct structural layout path par save kiya gaya hai
+                const testDocRef = doc(db, "tests", "history9_test", "students", currentRoll);
                 await setDoc(testDocRef, {
                     submitted: true,
                     score: finalScoreStr,
