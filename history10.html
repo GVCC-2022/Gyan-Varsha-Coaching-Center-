@@ -254,21 +254,44 @@
     </div>
 
     <script type="module">
-        // ⏰ AUTO-LOCK SYSTEM (Isse aapko manually code nahi hatana padega!)
+        // ⏰ AUTO-LOCK & AUTO-SUBMIT SYSTEM (11:30 to 11:32)
 function checkTestTime() {
-    // Yahan test shuru hone ka time set karein (Year-Month-Day T Hours:Minutes:Seconds)
-    // Aaj ki date aur time 11:00:00 AM set hai
-    const testStartTime = new Date("2027-06-22T11:00:00").getTime(); 
+    // 1. Test ka Start aur End Time yahan set karein
+    const testStartTime = new Date("2026-06-22T11:30:00").getTime(); 
+    const testEndTime = new Date("2026-06-22T11:32:00").getTime(); 
     const currentTime = new Date().getTime();
 
-    if (currentTime >= testStartTime) {
-        // Jaise hi 11 bajenge -> Message hatao aur Password field dikhao!
-        document.getElementById("timeLockMessage").style.display = "none";
-        document.getElementById("passwordArea").style.display = "block";
+    // Condition A: Agar 11:20 baj chuke hain (Test Time Over)
+    if (currentTime >= testEndTime) {
+        
+        // Agar baccha test ke andar hai aur usne submit nahi kiya hai
+        if (typeof isTestStarted !== 'undefined' && isTestStarted === true && hasSubmitted === false) {
+            alert("⏰ Time is Up! 11:32 AM ho chuke hain. Aapka test automatic submit kiya ja raha hai.");
+            window.processSubmission(true); // Yeh line turant test submit kar degi
+        } 
+        // Agar baccha bahar password wale page par baitha hai (ya late aaya hai)
+        else if (typeof isTestStarted === 'undefined' || isTestStarted === false) {
+            document.getElementById("timeLockMessage").innerHTML = "<i class='fa-solid fa-ban'></i> Test ka samay samapt ho chuka hai (11:32 AM). Ab entry close ho gayi hai.";
+            document.getElementById("timeLockMessage").style.display = "block";
+            document.getElementById("passwordArea").style.display = "none";
+        }
     }
+    
+    // Condition B: Agar time 11:00 baje se 11:20 ke beech hai (Test is LIVE)
+    else if (currentTime >= testStartTime && currentTime < testEndTime) {
+        if (typeof isTestStarted === 'undefined' || isTestStarted === false) {
+            // Laal warning chupao, Password box dikhao
+            document.getElementById("timeLockMessage").style.display = "none";
+            document.getElementById("passwordArea").style.display = "block";
+        }
+    }
+    
+    // Condition C: 11:00 bajne se pehle (Already HTML me hide set hai)
 }
-// Har 1 second mein chupchap check karega (Bacchon ko page refresh bhi nahi karna padega)
+
+// Yeh engine har 1 second me silent check karega
 setInterval(checkTestTime, 1000);
+
 checkTestTime(); 
         
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
