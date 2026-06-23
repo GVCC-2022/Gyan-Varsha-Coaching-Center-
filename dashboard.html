@@ -86,17 +86,6 @@
             opacity: 0.8;
         }
 
-        .slogan-tag {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.2);
-            padding: 6px 15px;
-            border-radius: 50px;
-            font-size: 12px;
-            display: inline-block;
-            font-weight: 500;
-        }
-
         /* Main Container */
         .container {
             max-width: 450px;
@@ -139,7 +128,7 @@
         .info-label { color: #64748b; font-weight: 500; }
         .info-value { color: var(--text-main); font-weight: 600; }
 
-        /* Feature Grid System (2 Columns) */
+        /* Feature Grid System */
         .grid-menu {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -185,6 +174,16 @@
         .card-day1 { color: #8b5cf6; border-top: 4px solid #8b5cf6; }
         .card-result { color: #10b981; border-top: 4px solid #10b981; }
         .card-performer { color: #a855f7; border-top: 4px solid #a855f7; }
+        
+        /* New Install App Card Style */
+        .card-install { 
+            background: linear-gradient(135deg, #e0f2fe, #bae6fd) !important;
+            color: #0284c7; 
+            border: 1px solid #7dd3fc;
+            flex-direction: row;
+            padding: 14px;
+        }
+        .card-install i { font-size: 20px; animation: bounce 2s infinite; }
 
         .menu-card:active {
             transform: scale(0.95);
@@ -226,6 +225,12 @@
             0% { transform: scale(1); }
             50% { transform: scale(1.1); }
             100% { transform: scale(1); }
+        }
+
+        @keyframes bounce { 
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 
+            40% {transform: translateY(-5px);} 
+            60% {transform: translateY(-3px);} 
         }
     </style>
 </head>
@@ -296,7 +301,6 @@
                     <span>Notice Board</span>
                 </button>
 
-                <!-- 🚀 Updated: Smart Online Test Router -->
                 <button class="menu-card card-test" onclick="routeToLiveTest()">
                     <i class="fa-solid fa-pen-to-square"></i>
                     <span>Online Test</span>
@@ -307,7 +311,6 @@
                     <span>Day 1 Test</span>
                 </button>
 
-                <!-- 🚀 Updated: Smart Result Router -->
                 <button class="menu-card card-result" onclick="routeToResult()">
                     <i class="fa-solid fa-chart-bar"></i>
                     <span>Result</span>
@@ -316,6 +319,12 @@
                 <button class="menu-card card-performer" onclick="window.location.href='results.html'">
                     <i class="fa-solid fa-trophy"></i>
                     <span>Day 1 Performers</span>
+                </button>
+
+                <!-- 🚀 NEW SMART INSTALL APP BUTTON -->
+                <button class="menu-card card-install full-width" onclick="installApp()">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Install GVCC App</span>
                 </button>
             </div>
 
@@ -330,6 +339,33 @@
             <p>© Gyan Varsha Coaching Center</p>
         </footer>
     </div>
+
+    <!-- Smart Install App Logic -->
+    <script>
+        let deferredPrompt;
+        
+        // Browser ka default install popup rok kar use apne button ke liye save karna
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+
+        // Button click hone par yeh function chalega
+        window.installApp = async function() {
+            if (deferredPrompt) {
+                // Agar phone app install support karta hai, to seedha install window kholo
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    console.log('User ne App install kar li hai!');
+                }
+                deferredPrompt = null;
+            } else {
+                // Agar phone me support nahi hai (jaise iPhone), to steps dikhao
+                alert("📲 App Install Kaise Karein:\n\n1. Apne browser ke upar ya niche 3 dots (⋮) par click karein.\n2. 'Add to Home Screen' ya 'Install App' par click karein.\n3. Bas! Ab app aapke phone me install ho jayegi.");
+            }
+        };
+    </script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
@@ -384,7 +420,6 @@
             }
         }
 
-        // 🎯 Smart Routing Logic for Online Test
         window.routeToLiveTest = function() {
             let cleanClass = String(studentClassGlobal).toLowerCase();
             
@@ -399,7 +434,6 @@
             }
         }
 
-        // 🎯 Smart Routing Logic for Results
         window.routeToResult = function() {
             let cleanClass = String(studentClassGlobal).toLowerCase();
             
