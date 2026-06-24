@@ -93,7 +93,7 @@
             background: rgba(30, 41, 59, 0.8);
             border-radius: 12px;
             overflow: hidden;
-            display: none; /* Hidden by default */
+            display: none; 
             border: 1px solid rgba(255,255,255,0.1);
         }
         table { width: 100%; border-collapse: collapse; text-align: left; }
@@ -150,11 +150,9 @@
 
     <div class="control-box">
         <div>
+            <!-- 🚀 DROPDOWN AB DYNAMIC HO GAYA HAI -->
             <select id="testSelectMenu" class="select-style" onchange="updateSubtitleText()">
-                <option value="maths_day1">🧮 Day 1 - Arithmetic Foundation (Maths)</option>
-                <option value="history8_test">📘 Class 8th - History Test</option>
-                <option value="history9_test">📚 Class 9th - History Test</option>
-                <option value="history10_test">📖 Class 10th - History Test</option>
+                <option value="">🔄 Loading Active Tests from Database...</option>
             </select>
         </div>
         
@@ -170,8 +168,9 @@
         </div>
     </div>
 
-    <div id="statusMessage" class="status-msg">Select an option above to load data.</div>
+    <div id="statusMessage" class="status-msg">Select a test above to load data.</div>
 
+    <!-- 🏆 Scoreboard Container -->
     <div class="scoreboard-container" id="scoreboardContainer">
         <table id="scoreboardTable">
             <thead>
@@ -184,10 +183,12 @@
                 </tr>
             </thead>
             <tbody id="scoreboardBody">
-                </tbody>
+                <!-- Data will load here dynamically -->
+            </tbody>
         </table>
     </div>
 
+    <!-- 👤 Single Student Performance Card -->
     <div class="student-info-card" id="studentInfoCard">
         <div>
             <h2 id="cardName">Student Name</h2>
@@ -200,11 +201,12 @@
         </div>
     </div>
 
+    <!-- 📸 Photo Gallery -->
     <div class="gallery-grid" id="photoGallery"></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBJX_dyLK80p2rNqSVvGY67TpWV7e_UdPI",
@@ -233,21 +235,61 @@
         }
         fetchAppDownloads();
 
+        // 🚀 NAYA SYSTEM: DATABASE SE DIRECT TESTS KI LIST MANGWANA
+        async function loadAvailableTests() {
+            const selectMenu = document.getElementById("testSelectMenu");
+            try {
+                // "active_tests" collection se data la rahe hain
+                const q = query(collection(db, "active_tests"), orderBy("timestamp", "desc"));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    selectMenu.innerHTML = '<option value="">No tests published yet.</option>';
+                    return;
+                }
+
+                selectMenu.innerHTML = ''; // Loading text hatao
+                
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const option = document.createElement("option");
+                    // Test ka asli ID value me save hoga
+                    option.value = doc.id; 
+                    // Teacher ko Dropdown me Class, Subject aur Test ka naam dikhega
+                    option.text = `📌 ${data.targetClass} - ${data.testName} (${data.subject})`;
+                    selectMenu.appendChild(option);
+                });
+
+                updateSubtitleText(); // List aane ke baad subtitle update karo
+            } catch (error) {
+                console.error("Error loading tests:", error);
+                selectMenu.innerHTML = '<option value="">⚠️ Error loading tests from server.</option>';
+            }
+        }
+        
+        // Page load hote hi list mangwa lo
+        loadAvailableTests();
+
         window.updateSubtitleText = function() {
             const selectMenu = document.getElementById("testSelectMenu");
-            document.getElementById("liveTestSubtitle").innerText = `${selectMenu.options[selectMenu.selectedIndex].text} Data Viewer`;
+            if(selectMenu.options.length > 0 && selectMenu.value !== "") {
+                document.getElementById("liveTestSubtitle").innerText = `${selectMenu.options[selectMenu.selectedIndex].text} Viewer`;
+            } else {
+                document.getElementById("liveTestSubtitle").innerText = `Waiting for test selection...`;
+            }
             
-            // Hide elements on change
+            // UI Reset on Change
             document.getElementById("scoreboardContainer").style.display = "none";
             document.getElementById("studentInfoCard").style.display = "none";
             document.getElementById("photoGallery").innerHTML = "";
             document.getElementById("statusMessage").innerText = "Select an option above to load data.";
         };
-        updateSubtitleText();
 
         // 🏆 LOAD LIVE SCOREBOARD
         document.getElementById("loadScoreboardBtn").addEventListener("click", async () => {
             const testFolder = document.getElementById("testSelectMenu").value;
+            if(!testFolder) { alert("Please wait for tests to load or publish a test first."); return; }
+
             const tbody = document.getElementById("scoreboardBody");
             const status = document.getElementById("statusMessage");
             
@@ -259,6 +301,7 @@
             status.innerText = "";
 
             try {
+                // Yahan testFolder ki jagah test ka ID use ho raha hai
                 const studentsRef = collection(db, "tests", testFolder, "students");
                 const querySnapshot = await getDocs(studentsRef);
 
@@ -267,7 +310,7 @@
                     return;
                 }
 
-                tbody.innerHTML = ""; // Clear loader
+                tbody.innerHTML = ""; 
                 
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
@@ -299,6 +342,7 @@
             const status = document.getElementById("statusMessage");
             const infoCard = document.getElementById("studentInfoCard");
 
+            if(!testFolder) { alert("Please wait for tests to load or publish a test first."); return; }
             if(!rollNo) { alert("Please enter a valid student roll number!"); return; }
 
             // UI Adjustments
@@ -308,7 +352,6 @@
             status.innerText = "Loading performance and evidence...";
 
             try {
-                // 1. Fetch Student Main Result Document
                 const studentDocRef = doc(db, "tests", testFolder, "students", rollNo);
                 const studentSnap = await getDoc(studentDocRef);
 
@@ -327,7 +370,6 @@
                     infoCard.style.display = "flex";
                 }
 
-                // 2. Fetch Photos
                 const snapCollectionRef = collection(db, "tests", testFolder, "students", rollNo, "snapshots");
                 const querySnapshot = await getDocs(snapCollectionRef);
 
@@ -357,4 +399,4 @@
     </script>
 </body>
 </html>
-w
+
