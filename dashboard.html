@@ -466,6 +466,67 @@
             window.location.href = "student-login.html";
         }
         document.getElementById("logoutBtn").addEventListener("click", logout);
-    </script>
+    </script> 
+    <!-- Teacher Notice & Test Live Fetcher -->
+<script type="module">
+    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+    import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+    // Firebase Config (Aapka database)
+    const firebaseConfig = {
+        apiKey: "AIzaSyBJX_dyLK80p2rNqSVvGY67TpWV7e_UdPI",
+        authDomain: "gvcc-database.firebaseapp.com",
+        projectId: "gvcc-database",
+        storageBucket: "gvcc-database.firebasestorage.app",
+        messagingSenderId: "1063216875940",
+        appId: "1:1063216875940:web:a4ee2f39b01896b44c5931"
+    };
+
+    // Trick: Agar Firebase pehle se dashboard me initialize hai, to error nahi aayega
+    const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+    const db = getFirestore(app);
+
+    // 1. Fetch Live Notices
+    const qNotices = query(collection(db, "notices"), orderBy("timestamp", "desc"));
+    onSnapshot(qNotices, (snapshot) => {
+        const noticeBox = document.getElementById("studentNotices");
+        noticeBox.innerHTML = ""; 
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            noticeBox.innerHTML += `
+                <div style="background: rgba(30, 41, 59, 0.6); border-left: 4px solid #f59e0b; padding: 15px; margin-bottom: 15px; border-radius: 8px;">
+                    <div style="color: #94a3b8; font-size: 13px; margin-bottom: 5px;">
+                        <i class="fa-solid fa-bullhorn"></i> <strong>${data.teacherName}</strong> (${data.subject}) • Target: ${data.targetClass}
+                    </div>
+                    <div style="color: #f8fafc; font-size: 15px;">${data.message}</div>
+                </div>
+            `;
+        });
+    });
+
+    // 2. Fetch Live Tests
+    const qTests = query(collection(db, "active_tests"), orderBy("timestamp", "desc"));
+    onSnapshot(qTests, (snapshot) => {
+        const testBox = document.getElementById("studentTests");
+        testBox.innerHTML = "";
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            testBox.innerHTML += `
+                <div style="background: rgba(30, 41, 59, 0.6); border-left: 4px solid #10b981; padding: 15px; margin-bottom: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <div style="color: #94a3b8; font-size: 13px; margin-bottom: 3px;">
+                            <i class="fa-solid fa-file-signature"></i> <strong>${data.teacherName}</strong> (${data.subject}) • ${data.targetClass}
+                        </div>
+                        <div style="color: #f8fafc; font-size: 16px; font-weight: bold;">${data.testName}</div>
+                    </div>
+                    <a href="${data.testLink}" style="background: #10b981; color: #0f172a; padding: 8px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 14px; transition: 0.3s; white-space: nowrap;">
+                        Start Test <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+            `;
+        });
+    });
+</script>
+    
 </body>
 </html>
