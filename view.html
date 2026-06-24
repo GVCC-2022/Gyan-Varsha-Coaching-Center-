@@ -18,8 +18,23 @@
             border-bottom: 1px solid rgba(255,255,255,0.1);
             padding-bottom: 15px;
         }
-        .admin-header h1 { color: #38bdf8; margin: 0; font-size: 24px; }
+        .admin-header h1 { color: #38bdf8; margin: 0 0 10px 0; font-size: 24px; }
         
+        /* 🚀 Naya Download Stats Badge Style */
+        .stats-badge {
+            display: inline-block;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid #10b981;
+            color: #34d399;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.1);
+        }
+
         /* Form Box Styles for Dropdown and Search Input */
         .control-box {
             max-width: 500px;
@@ -97,6 +112,12 @@
 
     <div class="admin-header">
         <h1><i class="fa-solid fa-user-shield"></i> GVCC Proctoring Monitoring Panel</h1>
+        
+        <!-- 🚀 Live Download Count Show Hoga Yahan -->
+        <div class="stats-badge" id="appStatsDisplay">
+            <i class="fa-solid fa-download"></i> Total App Downloads: <span id="downloadCount">Loading...</span>
+        </div>
+
         <!-- Dynamic subtitle that changes based on select dropdown -->
         <p style="color: #94a3b8; font-size: 14px;" id="liveTestSubtitle">Active System Evidence Viewer</p>
     </div>
@@ -107,7 +128,6 @@
             <select id="testSelectMenu" class="select-style" onchange="updateSubtitleText()">
                 <option value="maths_day1">🧮 Day 1 - Arithmetic Foundation (Maths)</option>
                 <option value="history9_test">📚 Class 9th - History Test</option>
-                <!-- 🚀 Yahan Maine Class 10th Ka Option Add Kar Diya Hai -->
                 <option value="history10_test">📖 Class 10th - History Test</option>
             </select>
         </div>
@@ -123,7 +143,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+        // 🚀 Maine yahan 'doc' aur 'getDoc' add kar diya hai Firebase imports mein
+        import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBJX_dyLK80p2rNqSVvGY67TpWV7e_UdPI",
@@ -136,6 +157,27 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+
+        // 🎯 NAYA CODE: Page load hote hi Downloads Count Fetch Karega
+        async function fetchAppDownloads() {
+            try {
+                const statsRef = doc(db, "admin_stats", "app_downloads");
+                const statsSnap = await getDoc(statsRef);
+                
+                if (statsSnap.exists()) {
+                    let totalCount = statsSnap.data().total_downloads || 0;
+                    document.getElementById("downloadCount").innerText = totalCount;
+                } else {
+                    document.getElementById("downloadCount").innerText = "0";
+                }
+            } catch (error) {
+                console.error("Error fetching stats:", error);
+                document.getElementById("downloadCount").innerText = "Error";
+            }
+        }
+        
+        // Function call kar diya taaki page khulte hi count aa jaye
+        fetchAppDownloads();
 
         // Subtitle dynamic text renderer engine
         window.updateSubtitleText = function() {
@@ -164,7 +206,7 @@
             status.innerText = "Loading proctoring snapshots from main server...";
 
             try {
-                // 🚀 Dynamic Collection Path: tests -> [selectedTestFolder] -> students -> [rollNo] -> snapshots
+                // Dynamic Collection Path: tests -> [selectedTestFolder] -> students -> [rollNo] -> snapshots
                 const snapCollectionRef = collection(db, "tests", selectedTestFolder, "students", rollNo, "snapshots");
                 const querySnapshot = await getDocs(snapCollectionRef);
 
