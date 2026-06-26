@@ -152,7 +152,7 @@
         <div>
             <!-- 🚀 DROPDOWN AB DYNAMIC HO GAYA HAI -->
             <select id="testSelectMenu" class="select-style" onchange="updateSubtitleText()">
-                <option value="">🔄 Loading Active Tests from Database...</option>
+                <option value="">🔄 Loading Tests...</option>
             </select>
         </div>
         
@@ -235,35 +235,47 @@
         }
         fetchAppDownloads();
 
-        // 🚀 NAYA SYSTEM: DATABASE SE DIRECT TESTS KI LIST MANGWANA
+        // 🚀 NAYA SYSTEM: PURANE TESTS AUR NAYE TESTS DONO DIKHAYEGA
         async function loadAvailableTests() {
             const selectMenu = document.getElementById("testSelectMenu");
             try {
-                // "active_tests" collection se data la rahe hain
+                // 1. Pehle purane (Old) tests list mein daal do taaki unka result hamesha dikhe
+                selectMenu.innerHTML = `
+                    <option value="" disabled selected>Select a test to view...</option>
+                    <option disabled>────────── Old Tests ──────────</option>
+                    <option value="maths_day1">🧮 Day 1 - Arithmetic Foundation</option>
+                    <option value="history8_test">📘 Class 8th - History Test</option>
+                    <option value="history9_test">📚 Class 9th - History Test</option>
+                    <option value="history10_test">📖 Class 10th - History Test</option>
+                    <option disabled>────────── New Live Tests ──────────</option>
+                `;
+
+                // 2. Ab Teacher Dashboard se publish hue naye tests check karo
                 const q = query(collection(db, "active_tests"), orderBy("timestamp", "desc"));
                 const querySnapshot = await getDocs(q);
 
-                if (querySnapshot.empty) {
-                    selectMenu.innerHTML = '<option value="">No tests published yet.</option>';
-                    return;
+                // 3. Agar naye test hain, toh unhe list ke niche jod do
+                if (!querySnapshot.empty) {
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        const option = document.createElement("option");
+                        option.value = doc.id; 
+                        option.text = `📌 ${data.targetClass} - ${data.testName} (${data.subject})`;
+                        selectMenu.appendChild(option);
+                    });
                 }
 
-                selectMenu.innerHTML = ''; // Loading text hatao
-                
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const option = document.createElement("option");
-                    // Test ka asli ID value me save hoga
-                    option.value = doc.id; 
-                    // Teacher ko Dropdown me Class, Subject aur Test ka naam dikhega
-                    option.text = `📌 ${data.targetClass} - ${data.testName} (${data.subject})`;
-                    selectMenu.appendChild(option);
-                });
-
-                updateSubtitleText(); // List aane ke baad subtitle update karo
+                updateSubtitleText(); 
             } catch (error) {
                 console.error("Error loading tests:", error);
-                selectMenu.innerHTML = '<option value="">⚠️ Error loading tests from server.</option>';
+                // Agar error aaye tab bhi purane tests dikhte rahein
+                selectMenu.innerHTML = `
+                    <option value="" disabled selected>Select a test to view...</option>
+                    <option value="maths_day1">🧮 Day 1 - Arithmetic Foundation</option>
+                    <option value="history8_test">📘 Class 8th - History Test</option>
+                    <option value="history9_test">📚 Class 9th - History Test</option>
+                    <option value="history10_test">📖 Class 10th - History Test</option>
+                `;
             }
         }
         
@@ -288,7 +300,7 @@
         // 🏆 LOAD LIVE SCOREBOARD
         document.getElementById("loadScoreboardBtn").addEventListener("click", async () => {
             const testFolder = document.getElementById("testSelectMenu").value;
-            if(!testFolder) { alert("Please wait for tests to load or publish a test first."); return; }
+            if(!testFolder) { alert("Please select a test from the list first."); return; }
 
             const tbody = document.getElementById("scoreboardBody");
             const status = document.getElementById("statusMessage");
@@ -342,7 +354,7 @@
             const status = document.getElementById("statusMessage");
             const infoCard = document.getElementById("studentInfoCard");
 
-            if(!testFolder) { alert("Please wait for tests to load or publish a test first."); return; }
+            if(!testFolder) { alert("Please select a test from the list first."); return; }
             if(!rollNo) { alert("Please enter a valid student roll number!"); return; }
 
             // UI Adjustments
@@ -399,4 +411,3 @@
     </script>
 </body>
 </html>
-
