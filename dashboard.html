@@ -504,7 +504,7 @@
         });
     });
 
-    // 2. Fetch Live Tests
+        // 2. Fetch Live Tests
     const qTests = query(collection(db, "active_tests"), orderBy("timestamp", "desc"));
     onSnapshot(qTests, (snapshot) => {
         const testBox = document.getElementById("studentTests");
@@ -519,13 +519,14 @@
                         </div>
                         <div style="color: #f8fafc; font-size: 16px; font-weight: bold;">${data.testName}</div>
                     </div>
-                    <a href="${data.testLink}" style="background: #10b981; color: #0f172a; padding: 8px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 14px; transition: 0.3s; white-space: nowrap;">
+                    <a href="live-exam.html?testId=${doc.id}" style="background: #10b981; color: #0f172a; padding: 8px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 14px; transition: 0.3s; white-space: nowrap;">
                         Start Test <i class="fa-solid fa-arrow-right"></i>
                     </a>
                 </div>
             `;
         });
     });
+
 </script>
     
 </body>
