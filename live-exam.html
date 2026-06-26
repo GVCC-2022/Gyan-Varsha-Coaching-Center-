@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GVCC Live Exam</title>
+    <title>GVCC Live Smart Exam</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
@@ -12,10 +12,10 @@
             color: #f8fafc;
             margin: 0;
             padding: 0;
-            user-select: none; /* Text copy hone se rokne ke liye */
+            user-select: none; /* No text copy */
         }
         
-        /* Header */
+        /* Premium Header */
         .exam-header {
             background: #1e293b;
             padding: 15px 20px;
@@ -29,28 +29,33 @@
         }
         .student-info { font-size: 14px; color: #94a3b8; }
         .student-info strong { color: #f8fafc; font-size: 16px; }
-        .warning-box {
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-            padding: 5px 15px;
+        
+        .timer-box {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            padding: 8px 15px;
             border-radius: 50px;
-            font-size: 14px;
+            font-size: 18px;
             font-weight: bold;
-            border: 1px solid #ef4444;
+            border: 1px solid #10b981;
             display: flex;
             align-items: center;
             gap: 8px;
         }
+        .timer-danger { background: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: #ef4444; }
+
+        .warning-box {
+            color: #ef4444;
+            font-size: 14px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 5px;
+        }
 
         /* Exam Container */
-        .exam-container {
-            max-width: 800px;
-            margin: 30px auto;
-            padding: 20px;
-        }
+        .exam-container { max-width: 800px; margin: 30px auto; padding: 20px; display: none; }
         .test-title { text-align: center; color: #38bdf8; margin-bottom: 30px; }
 
-        /* Questions Box */
         .question-card {
             background: #1e293b;
             padding: 25px;
@@ -58,88 +63,68 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             margin-bottom: 25px;
         }
-        .question-text {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
+        .question-text { font-size: 18px; font-weight: bold; margin-bottom: 20px; }
         .option-label {
-            display: block;
-            background: rgba(15, 23, 42, 0.8);
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: 0.2s;
+            display: block; background: rgba(15, 23, 42, 0.8); padding: 15px;
+            margin-bottom: 10px; border-radius: 8px; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .option-label:hover { background: rgba(56, 189, 248, 0.1); border-color: #38bdf8; }
-        
-        /* Custom Radio Button styling */
         input[type="radio"] { margin-right: 10px; transform: scale(1.2); accent-color: #38bdf8; }
 
-        /* Submit Button */
         .submit-btn {
-            width: 100%;
-            background: #10b981;
-            color: white;
-            border: none;
-            padding: 15px;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-top: 20px;
+            width: 100%; background: #10b981; color: white; border: none; padding: 15px;
+            font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; margin-top: 20px;
         }
-        .submit-btn:hover { background: #059669; }
 
-        /* Fullscreen Overlay (Loading/Submitting) */
+        /* Fullscreen Overlay (Loading/Error) */
         .overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #0f172a; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; z-index: 1000;
+            justify-content: center; align-items: center; z-index: 1000; text-align: center; padding: 20px; box-sizing: border-box;
         }
         .loader {
-            border: 5px solid rgba(255,255,255,0.1);
-            border-top: 5px solid #38bdf8;
-            border-radius: 50%; width: 50px; height: 50px;
-            animation: spin 1s linear infinite; margin-bottom: 20px;
+            border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid #38bdf8;
+            border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 20px;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Hidden Camera Elements */
+        /* Hidden Camera */
         #proctorCamera, #snapshotCanvas { display: none; }
     </style>
 </head>
 <body>
 
+    <!-- Loading & Error Screen -->
     <div class="overlay" id="loadingOverlay">
-        <div class="loader"></div>
-        <h2 id="loadingText">Preparing your Smart Exam...</h2>
+        <div class="loader" id="spinner"></div>
+        <h2 id="loadingText">Authenticating & Loading Test...</h2>
+        <button onclick="window.location.href='index.html'" class="submit-btn" id="goBackBtn" style="display:none; width: 200px; margin-top:20px; background: #38bdf8;">Go Back to Dashboard</button>
     </div>
 
+    <!-- Hidden Proctoring -->
     <video id="proctorCamera" autoplay playsinline></video>
     <canvas id="snapshotCanvas"></canvas>
 
+    <!-- Header -->
     <div class="exam-header">
         <div class="student-info">
             <div id="displayStudentName"><strong>Loading...</strong></div>
             <div>Roll: <span id="displayRoll">--</span> | Class: <span id="displayClass">--</span></div>
         </div>
-        <div class="warning-box" id="warningBox">
-            <i class="fa-solid fa-eye"></i> Proctoring Active
+        <div>
+            <div class="timer-box" id="timerBox">
+                <i class="fa-solid fa-hourglass-half"></i> <span id="timeRemaining">00:00</span>
+            </div>
+            <div class="warning-box" id="warningBox">Warnings: 0/3</div>
         </div>
     </div>
 
-    <div class="exam-container">
+    <!-- Exam Content -->
+    <div class="exam-container" id="examContainer">
         <h2 class="test-title" id="testTitle">Loading Test...</h2>
         
         <form id="examForm">
-            <div id="questionsContainer">
-                </div>
-            
-            <button type="button" class="submit-btn" id="submitExamBtn" style="display:none;">
+            <div id="questionsContainer"></div>
+            <button type="button" class="submit-btn" id="submitExamBtn">
                 <i class="fa-solid fa-check-circle"></i> Submit Exam
             </button>
         </form>
@@ -147,9 +132,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
-        import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
-        // Firebase Setup
         const firebaseConfig = {
             apiKey: "AIzaSyBJX_dyLK80p2rNqSVvGY67TpWV7e_UdPI",
             authDomain: "gvcc-database.firebaseapp.com",
@@ -161,206 +145,199 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // 🚀 1. AUTO-FETCH STUDENT DATA (Saves time & effort)
-                // 🚀 1. AUTO-FETCH STUDENT DATA (Perfectly matched with Dashboard)
+        // Variables
         const studentRoll = localStorage.getItem("studentRoll");
-        let studentName = "Loading...";
-        let studentClass = "Loading...";
+        let studentName = "Unknown";
+        let studentClass = "Unknown";
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const testId = urlParams.get("testId");
 
-        // Agar baccha login nahi hai, toh wapas login page par bhej do
-        if (!studentRoll) {
-            alert("Error: You are not logged in! Please login first.");
-            window.location.href = "student-login.html"; 
-        } else {
-            // Roll number turant dikha do
-            document.getElementById("displayRoll").innerText = studentRoll;
-            
-            // Name aur Class Firebase se mangwa lo (Jaise Dashboard karta hai)
-            const studentDocRef = doc(db, "students", studentRoll);
-            getDoc(studentDocRef).then((docSnap) => {
-                if(docSnap.exists()){
-                    const data = docSnap.data();
-                    // Dashboard wale exact words (Name, Class) use kiye hain
+        let testQuestions = [];
+        let cheatWarnings = 0;
+        const maxWarnings = 3;
+        let timerInterval;
+
+        // Display Error Function
+        function showError(message) {
+            document.getElementById("spinner").style.display = "none";
+            document.getElementById("loadingText").innerHTML = `<span style="color: #ef4444;"><i class="fa-solid fa-circle-exclamation"></i> ${message}</span>`;
+            document.getElementById("goBackBtn").style.display = "block";
+        }
+
+        async function initExam() {
+            if (!studentRoll) {
+                alert("Please login first!");
+                window.location.href = "student-login.html";
+                return;
+            }
+            if (!testId) { showError("Test ID Missing! Invalid Link."); return; }
+
+            try {
+                // 1. Fetch Student Details
+                const studentDocSnap = await getDoc(doc(db, "students", studentRoll));
+                if(studentDocSnap.exists()) {
+                    const data = studentDocSnap.data();
                     studentName = data["Name "] || data.Name || "Unknown";
                     studentClass = data["Class "] || data.Class || "Unknown";
                     
                     document.getElementById("displayStudentName").innerHTML = `<strong>${studentName}</strong>`;
+                    document.getElementById("displayRoll").innerText = studentRoll;
                     document.getElementById("displayClass").innerText = studentClass;
                 }
-            }).catch((err) => {
-                console.error("Error fetching name:", err);
-            });
-        }
 
-
-        // 🚀 2. GET TEST ID FROM URL (Pata karna ki kaunsa test kholna hai)
-        // URL aisa hoga: live-exam.html?testId=ABCDEFG
-        const urlParams = new URLSearchParams(window.location.search);
-        const testId = urlParams.get("testId");
-
-        let testQuestions = []; // AI Code yahan save hoga
-        let cheatWarnings = 0;
-
-        // Start Camera & Load Test
-        async function initExam() {
-            if (!testId) {
-                document.getElementById("loadingText").innerText = "Error: Test ID missing!";
-                return;
-            }
-
-            try {
-                // Fetch AI Code from Database
+                // 2. Fetch Test Details
                 const testDoc = await getDoc(doc(db, "active_tests", testId));
-                if (testDoc.exists()) {
-                    const data = testDoc.data();
-                    document.getElementById("testTitle").innerText = `${data.targetClass} - ${data.testName}`;
-                    
-                    // JSON Code ko asli questions mein badalna
-                    testQuestions = JSON.parse(data.testCode);
-                    renderQuestions();
-                    
-                    // Proctoring Shuru karna
-                    startCamera();
-                } else {
-                    document.getElementById("loadingText").innerText = "Test Not Found!";
+                if (!testDoc.exists()) { showError("Test Not Found or Removed."); return; }
+                const testData = testDoc.data();
+
+                // 🚀 PROBLEM 1 FIX: Class Match Restriction
+                // Class numbers nikalkar check karna (e.g. "Class 10" aur "10th" dono se "10" milega)
+                const sNum = String(studentClass).replace(/\D/g, ""); 
+                const tNum = String(testData.targetClass).replace(/\D/g, "");
+                
+                if(sNum !== tNum && tNum !== "") {
+                    showError(`Yeh test Class ${tNum} ke liye hai, aap isse nahi de sakte!`);
+                    return;
                 }
+
+                // 🚀 PROBLEM 3 FIX: One-time Entry Check
+                const attemptCheck = await getDoc(doc(db, "tests", testId, "students", studentRoll));
+                if (attemptCheck.exists() && attemptCheck.data().submitted === true) {
+                    showError(`Aap already yeh test de chuke hain!<br><br>Score: ${attemptCheck.data().score}`);
+                    return;
+                }
+
+                // Setup Test
+                document.getElementById("testTitle").innerText = `${testData.targetClass} - ${testData.testName}`;
+                testQuestions = JSON.parse(testData.testCode);
+                
+                renderQuestions();
+                startCamera();
+                
+                // 🚀 PROBLEM 2 FIX: Auto Timer Start (1 Question = 90 Seconds)
+                startTimer(testQuestions.length * 90);
+
             } catch (error) {
                 console.error(error);
-                document.getElementById("loadingText").innerText = "Failed to load exam data.";
+                showError("Server Connection Failed.");
             }
         }
 
-        // 🚀 3. RENDER QUESTIONS (AI code se Paper design karna)
+        // Render Questions
         function renderQuestions() {
             const container = document.getElementById("questionsContainer");
             container.innerHTML = "";
-
             testQuestions.forEach((q, index) => {
                 let optionsHTML = "";
-                // Charo options banana
-                q.options.forEach((opt, optIndex) => {
-                    optionsHTML += `
-                        <label class="option-label">
-                            <input type="radio" name="q${index}" value="${opt}">
-                            ${opt}
-                        </label>
-                    `;
+                q.options.forEach(opt => {
+                    optionsHTML += `<label class="option-label"><input type="radio" name="q${index}" value="${opt}"> ${opt}</label>`;
                 });
-
-                // Question Card banana
-                container.innerHTML += `
-                    <div class="question-card">
-                        <div class="question-text">Q${index + 1}. ${q.question}</div>
-                        ${optionsHTML}
-                    </div>
-                `;
+                container.innerHTML += `<div class="question-card"><div class="question-text">Q${index + 1}. ${q.question}</div>${optionsHTML}</div>`;
             });
 
-            // Loading screen hatao aur submit button dikhao
             document.getElementById("loadingOverlay").style.display = "none";
-            document.getElementById("submitExamBtn").style.display = "block";
+            document.getElementById("examContainer").style.display = "block";
         }
 
-        // 🚀 4. STEALTH PROCTORING SYSTEM
+        // 🚀 TIMING LOGIC
+        function startTimer(totalSeconds) {
+            timerInterval = setInterval(() => {
+                totalSeconds--;
+                let minutes = Math.floor(totalSeconds / 60);
+                let seconds = totalSeconds % 60;
+                
+                let timeStr = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                document.getElementById("timeRemaining").innerText = timeStr;
+
+                if (totalSeconds <= 60) {
+                    document.getElementById("timerBox").classList.add("timer-danger");
+                }
+
+                if (totalSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    alert("⏳ Time is UP! Auto-submitting your test.");
+                    submitExamProcess("Time Up");
+                }
+            }, 1000);
+        }
+
+        // 🚀 PROCTORING & CHEATING SYSTEM (Max 3 Warnings)
         async function startCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
-                const video = document.getElementById("proctorCamera");
-                video.srcObject = stream;
-                
-                // Har 45 seconds me chupke se photo khichna
-                setInterval(captureAndUploadSnapshot, 45000);
-            } catch (err) {
-                alert("⚠️ Please allow CAMERA permissions to start the exam!");
-            }
+                document.getElementById("proctorCamera").srcObject = stream;
+                setInterval(() => captureAndUploadSnapshot("Auto Check"), 45000);
+            } catch (err) { console.warn("Camera access denied."); }
         }
 
-        // Tab Switching Detector
         document.addEventListener("visibilitychange", () => {
             if (document.hidden) {
                 cheatWarnings++;
-                alert(`⚠️ Warning! You left the test screen. Warning Count: ${cheatWarnings}`);
-                document.getElementById("warningBox").innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Warnings: ${cheatWarnings}`;
-                captureAndUploadSnapshot("Tab Switched"); // Tab switch karte hi photo
+                document.getElementById("warningBox").innerText = `Warnings: ${cheatWarnings}/${maxWarnings}`;
+                captureAndUploadSnapshot("Tab Switched");
+                
+                if(cheatWarnings >= maxWarnings) {
+                    alert("🚫 CHEATING DETECTED! You changed tabs 3 times. Test is cancelled and auto-submitted.");
+                    submitExamProcess("Cheating / Terminated");
+                } else {
+                    alert(`⚠️ WARNING! Do not change screen or minimize app. Warning ${cheatWarnings} of ${maxWarnings}`);
+                }
             }
         });
 
-        async function captureAndUploadSnapshot(reason = "Auto Check") {
+        async function captureAndUploadSnapshot(reason) {
             const video = document.getElementById("proctorCamera");
             const canvas = document.getElementById("snapshotCanvas");
             if (video.readyState !== 4) return;
-
-            canvas.width = 320; 
-            canvas.height = 240;
+            canvas.width = 320; canvas.height = 240;
             canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
-            const base64Image = canvas.toDataURL("image/jpeg", 0.6); // Compress image
-
-            // Upload directly to student's specific test snapshot folder
             try {
                 await addDoc(collection(db, "tests", testId, "students", studentRoll, "snapshots"), {
-                    capturedImage: base64Image,
-                    reason: reason,
-                    capturedAt: new Date().toLocaleTimeString()
+                    capturedImage: canvas.toDataURL("image/jpeg", 0.6), reason: reason, capturedAt: new Date().toLocaleTimeString()
                 });
-            } catch (e) { console.error("Snap error", e); }
+            } catch (e) { }
         }
 
-        // 🚀 5. SUBMIT EXAM & AUTO CHECKING
-        document.getElementById("submitExamBtn").addEventListener("click", async () => {
-            // Confirm box
-            if(!confirm("Are you sure you want to submit the exam?")) return;
+        // 🚀 SUBMIT EXAM
+        document.getElementById("submitExamBtn").addEventListener("click", () => {
+            if(confirm("Are you sure you want to submit?")) submitExamProcess("Clean / No Cheating");
+        });
 
-            // Loading screen wapas dikhao
+        async function submitExamProcess(finalStatus) {
+            clearInterval(timerInterval); // Timer rok do
+            document.getElementById("examContainer").style.display = "none";
             document.getElementById("loadingOverlay").style.display = "flex";
             document.getElementById("loadingText").innerText = "Checking Answers & Submitting...";
+            document.getElementById("spinner").style.display = "block";
 
             let score = 0;
-            
-            // Checking Loop
             testQuestions.forEach((q, index) => {
-                // Bacche ne kya select kiya
-                const selectedOption = document.querySelector(`input[name="q${index}"]:checked`);
-                if (selectedOption && selectedOption.value === q.answer) {
-                    score++; // Sahi jawab par +1
-                }
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                if (selected && selected.value === q.answer) score++;
             });
 
-            // Status tay karna
-            const finalCheatStatus = cheatWarnings > 0 ? `${cheatWarnings} Warnings (Suspected)` : "Clean / No Cheating";
-            const percentage = Math.round((score / testQuestions.length) * 100) + "%";
+            if(cheatWarnings > 0 && finalStatus === "Clean / No Cheating") finalStatus = `${cheatWarnings} Warnings`;
 
-            // Database me bhej do (Aapke view.html ke liye)
             try {
                 await setDoc(doc(db, "tests", testId, "students", studentRoll), {
-                    name: studentName,
-                    class: studentClass,
-                    score: `${score}/${testQuestions.length}`,
-                    percentage: percentage,
-                    cheatStatus: finalCheatStatus,
-                    submitted: true,
-                    submittedAt: new Date().toLocaleString()
+                    name: studentName, class: studentClass, score: `${score}/${testQuestions.length}`,
+                    percentage: Math.round((score / testQuestions.length) * 100) + "%",
+                    cheatStatus: finalStatus, submitted: true, submittedAt: new Date().toLocaleString()
                 });
-
-                // Camera band karo
-                const video = document.getElementById("proctorCamera");
-                if (video.srcObject) { video.srcObject.getTracks().forEach(track => track.stop()); }
 
                 document.getElementById("loadingOverlay").innerHTML = `
                     <i class="fa-solid fa-circle-check" style="font-size: 60px; color: #10b981; margin-bottom: 20px;"></i>
                     <h2>Exam Submitted Successfully!</h2>
-                    <p style="color: #94a3b8;">Score: ${score}/${testQuestions.length}</p>
-                    <button onclick="window.location.href='index.html'" class="submit-btn" style="width: 200px; margin-top:20px;">Go to Dashboard</button>
+                    <p style="color: #94a3b8; font-size: 18px;">Score: <strong>${score}/${testQuestions.length}</strong></p>
+                    <button onclick="window.location.href='index.html'" class="submit-btn" style="width: 200px; margin-top:20px;">Return to Home</button>
                 `;
             } catch (error) {
-                console.error(error);
-                alert("Failed to submit exam. Please check your internet connection.");
-                document.getElementById("loadingOverlay").style.display = "none";
+                showError("Failed to submit! Check Internet.");
             }
-        });
+        }
 
-        // Test start karo
         window.onload = initExam;
     </script>
 </body>
 </html>
-
