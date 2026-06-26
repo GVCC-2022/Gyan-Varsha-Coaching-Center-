@@ -162,21 +162,36 @@
         const db = getFirestore(app);
 
         // 🚀 1. AUTO-FETCH STUDENT DATA (Saves time & effort)
-        // Yahan dhyan dein: Aap jis naam se login save karte hain, wahi use kijiye.
-        // Example: sessionStorage.getItem("studentRoll")
-        const studentRoll = sessionStorage.getItem("loggedInRollNo") || localStorage.getItem("loggedInRollNo");
-        const studentName = sessionStorage.getItem("loggedInName") || localStorage.getItem("loggedInName");
-        const studentClass = sessionStorage.getItem("loggedInClass") || localStorage.getItem("loggedInClass");
+                // 🚀 1. AUTO-FETCH STUDENT DATA (Perfectly matched with Dashboard)
+        const studentRoll = localStorage.getItem("studentRoll");
+        let studentName = "Loading...";
+        let studentClass = "Loading...";
 
-        // Agar baccha login nahi hai, toh wapas bhej do
+        // Agar baccha login nahi hai, toh wapas login page par bhej do
         if (!studentRoll) {
             alert("Error: You are not logged in! Please login first.");
-            window.location.href = "index.html"; // Ya jo bhi aapka login page ho
+            window.location.href = "student-login.html"; 
         } else {
-            document.getElementById("displayStudentName").innerHTML = `<strong>${studentName}</strong>`;
+            // Roll number turant dikha do
             document.getElementById("displayRoll").innerText = studentRoll;
-            document.getElementById("displayClass").innerText = studentClass;
+            
+            // Name aur Class Firebase se mangwa lo (Jaise Dashboard karta hai)
+            const studentDocRef = doc(db, "students", studentRoll);
+            getDoc(studentDocRef).then((docSnap) => {
+                if(docSnap.exists()){
+                    const data = docSnap.data();
+                    // Dashboard wale exact words (Name, Class) use kiye hain
+                    studentName = data["Name "] || data.Name || "Unknown";
+                    studentClass = data["Class "] || data.Class || "Unknown";
+                    
+                    document.getElementById("displayStudentName").innerHTML = `<strong>${studentName}</strong>`;
+                    document.getElementById("displayClass").innerText = studentClass;
+                }
+            }).catch((err) => {
+                console.error("Error fetching name:", err);
+            });
         }
+
 
         // 🚀 2. GET TEST ID FROM URL (Pata karna ki kaunsa test kholna hai)
         // URL aisa hoga: live-exam.html?testId=ABCDEFG
