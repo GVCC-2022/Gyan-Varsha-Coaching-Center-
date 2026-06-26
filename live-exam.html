@@ -215,8 +215,12 @@
                 renderQuestions();
                 startCamera();
                 
-                // 🚀 PROBLEM 2 FIX: Auto Timer Start (1 Question = 90 Seconds)
-                startTimer(testQuestions.length * 90);
+                // 🚀 CUSTOM TIMER LOGIC (Teacher ka set kiya hua time)
+// Agar teacher ne time nahi daala, toh automatically 15 minute set ho jayega
+const allottedMinutes = testData.duration ? parseInt(testData.duration) : 15;
+const totalSeconds = allottedMinutes * 60;
+startTimer(totalSeconds);
+
 
             } catch (error) {
                 console.error(error);
