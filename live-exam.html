@@ -93,18 +93,15 @@
 </head>
 <body>
 
-    <!-- Loading & Error Screen -->
     <div class="overlay" id="loadingOverlay">
         <div class="loader" id="spinner"></div>
         <h2 id="loadingText">Authenticating & Loading Test...</h2>
         <button onclick="window.location.href='index.html'" class="submit-btn" id="goBackBtn" style="display:none; width: 200px; margin-top:20px; background: #38bdf8;">Go Back to Dashboard</button>
     </div>
 
-    <!-- Hidden Proctoring -->
     <video id="proctorCamera" autoplay playsinline></video>
     <canvas id="snapshotCanvas"></canvas>
 
-    <!-- Header -->
     <div class="exam-header">
         <div class="student-info">
             <div id="displayStudentName"><strong>Loading...</strong></div>
@@ -118,7 +115,6 @@
         </div>
     </div>
 
-    <!-- Exam Content -->
     <div class="exam-container" id="examContainer">
         <h2 class="test-title" id="testTitle">Loading Test...</h2>
         
@@ -191,8 +187,20 @@
                 if (!testDoc.exists()) { showError("Test Not Found or Removed."); return; }
                 const testData = testDoc.data();
 
-                // 🚀 PROBLEM 1 FIX: Class Match Restriction
-                // Class numbers nikalkar check karna (e.g. "Class 10" aur "10th" dono se "10" milega)
+                // 🚀 FIX 1: Strict Time Lock Logic
+                if (testData.testDate && testData.testTime) {
+                    const testStartTime = new Date(`${testData.testDate}T${testData.testTime}`);
+                    const currentTime = new Date();
+                    
+                    if (currentTime < testStartTime) {
+                        // Format time to AM/PM for user-friendly display
+                        const formattedTime = testStartTime.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+                        showError(`Exam is locked!<br><br>Scheduled Time: <strong>${testData.testDate} at ${formattedTime}</strong><br>Please refresh the page when it's time.`);
+                        return; // Stop exam from loading
+                    }
+                }
+
+                // Class Match Restriction
                 const sNum = String(studentClass).replace(/\D/g, ""); 
                 const tNum = String(testData.targetClass).replace(/\D/g, "");
                 
@@ -201,7 +209,7 @@
                     return;
                 }
 
-                // 🚀 PROBLEM 3 FIX: One-time Entry Check
+                // One-time Entry Check
                 const attemptCheck = await getDoc(doc(db, "tests", testId, "students", studentRoll));
                 if (attemptCheck.exists() && attemptCheck.data().submitted === true) {
                     showError(`Aap already yeh test de chuke hain!<br><br>Score: ${attemptCheck.data().score}`);
@@ -215,12 +223,10 @@
                 renderQuestions();
                 startCamera();
                 
-                // 🚀 CUSTOM TIMER LOGIC (Teacher ka set kiya hua time)
-// Agar teacher ne time nahi daala, toh automatically 15 minute set ho jayega
-const allottedMinutes = testData.duration ? parseInt(testData.duration) : 15;
-const totalSeconds = allottedMinutes * 60;
-startTimer(totalSeconds);
-
+                // Timer Logic
+                const allottedMinutes = testData.duration ? parseInt(testData.duration) : 15;
+                const totalSeconds = allottedMinutes * 60;
+                startTimer(totalSeconds);
 
             } catch (error) {
                 console.error(error);
@@ -244,7 +250,7 @@ startTimer(totalSeconds);
             document.getElementById("examContainer").style.display = "block";
         }
 
-        // 🚀 TIMING LOGIC
+        // Timer Function
         function startTimer(totalSeconds) {
             timerInterval = setInterval(() => {
                 totalSeconds--;
@@ -266,7 +272,7 @@ startTimer(totalSeconds);
             }, 1000);
         }
 
-        // 🚀 PROCTORING & CHEATING SYSTEM (Max 3 Warnings)
+        // 🚀 FIX 2: Advanced Anti-Cheating System
         async function startCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
@@ -275,35 +281,56 @@ startTimer(totalSeconds);
             } catch (err) { console.warn("Camera access denied."); }
         }
 
-        document.addEventListener("visibilitychange", () => {
-            if (document.hidden) {
+        // Handles cheating detection for both Tab Switch (visibilitychange) & Clicking outside window (blur)
+        function handleCheatingDetection() {
+            if (document.getElementById("examContainer").style.display === "block") {
                 cheatWarnings++;
                 document.getElementById("warningBox").innerText = `Warnings: ${cheatWarnings}/${maxWarnings}`;
-                captureAndUploadSnapshot("Tab Switched");
+                captureAndUploadSnapshot("Suspicious Activity (Tab Switch / Minimized)");
                 
                 if(cheatWarnings >= maxWarnings) {
-                    alert("🚫 CHEATING DETECTED! You changed tabs 3 times. Test is cancelled and auto-submitted.");
+                    alert("🚫 CHEATING DETECTED!\nAapne test window leave ki. Aapka exam terminate ho gaya hai.");
                     submitExamProcess("Cheating / Terminated");
                 } else {
-                    alert(`⚠️ WARNING! Do not change screen or minimize app. Warning ${cheatWarnings} of ${maxWarnings}`);
+                    alert(`⚠️ STRICT WARNING!\nAapne doosri window ya screen open ki hai. Aisa ${maxWarnings - cheatWarnings} baar aur karne par test cancel ho jayega.`);
                 }
             }
+        }
+
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) handleCheatingDetection();
+        });
+        
+        window.addEventListener("blur", () => {
+            handleCheatingDetection();
         });
 
+        // 🚀 FIX 3: Dynamic Canvas Aspect Ratio (No compressed images)
         async function captureAndUploadSnapshot(reason) {
             const video = document.getElementById("proctorCamera");
             const canvas = document.getElementById("snapshotCanvas");
-            if (video.readyState !== 4) return;
-            canvas.width = 320; canvas.height = 240;
+            
+            // Only capture if video has loaded properly
+            if (video.readyState !== 4 || video.videoWidth === 0) return;
+            
+            // Canvas ko exactly camera ki resolution ke barabar set karein
+            canvas.width = video.videoWidth; 
+            canvas.height = video.videoHeight;
+            
             canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+            
             try {
                 await addDoc(collection(db, "tests", testId, "students", studentRoll, "snapshots"), {
-                    capturedImage: canvas.toDataURL("image/jpeg", 0.6), reason: reason, capturedAt: new Date().toLocaleTimeString()
+                    capturedImage: canvas.toDataURL("image/jpeg", 0.6), 
+                    reason: reason, 
+                    capturedAt: new Date().toLocaleTimeString()
                 });
-            } catch (e) { }
+            } catch (e) { 
+                console.error("Snapshot error:", e);
+            }
         }
 
-        // 🚀 SUBMIT EXAM
+        // Submit Exam
         document.getElementById("submitExamBtn").addEventListener("click", () => {
             if(confirm("Are you sure you want to submit?")) submitExamProcess("Clean / No Cheating");
         });
