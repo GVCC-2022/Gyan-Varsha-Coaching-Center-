@@ -93,15 +93,19 @@
 </head>
 <body>
 
+    <!-- Loading & Error Screen -->
     <div class="overlay" id="loadingOverlay">
         <div class="loader" id="spinner"></div>
         <h2 id="loadingText">Authenticating & Loading Test...</h2>
-        <button onclick="window.location.href='index.html'" class="submit-btn" id="goBackBtn" style="display:none; width: 200px; margin-top:20px; background: #38bdf8;">Go Back to Dashboard</button>
+        <!-- Redirect to Dashboard rather than Index -->
+        <button onclick="window.location.href='student-dashboard.html'" class="submit-btn" id="goBackBtn" style="display:none; width: 250px; margin-top:20px; background: #38bdf8;">Go Back to Dashboard</button>
     </div>
 
+    <!-- Hidden Proctoring -->
     <video id="proctorCamera" autoplay playsinline></video>
     <canvas id="snapshotCanvas"></canvas>
 
+    <!-- Header -->
     <div class="exam-header">
         <div class="student-info">
             <div id="displayStudentName"><strong>Loading...</strong></div>
@@ -115,6 +119,7 @@
         </div>
     </div>
 
+    <!-- Exam Content -->
     <div class="exam-container" id="examContainer">
         <h2 class="test-title" id="testTitle">Loading Test...</h2>
         
@@ -153,6 +158,7 @@
         let cheatWarnings = 0;
         const maxWarnings = 3;
         let timerInterval;
+        let remainingSeconds = 0; // Global remaining time
 
         // Display Error Function
         function showError(message) {
@@ -187,17 +193,31 @@
                 if (!testDoc.exists()) { showError("Test Not Found or Removed."); return; }
                 const testData = testDoc.data();
 
-                // 🚀 FIX 1: Strict Time Lock Logic
+                // Base duration setting
+                remainingSeconds = (testData.duration ? parseInt(testData.duration) : 15) * 60;
+
+                // 🚀 FIX: Strict End Time & Live Sync Logic
                 if (testData.testDate && testData.testTime) {
                     const testStartTime = new Date(`${testData.testDate}T${testData.testTime}`);
+                    const durationMinutes = testData.duration ? parseInt(testData.duration) : 15;
+                    const testEndTime = new Date(testStartTime.getTime() + durationMinutes * 60000);
                     const currentTime = new Date();
                     
+                    // A) Agar time se pehle aaya hai
                     if (currentTime < testStartTime) {
-                        // Format time to AM/PM for user-friendly display
                         const formattedTime = testStartTime.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
                         showError(`Exam is locked!<br><br>Scheduled Time: <strong>${testData.testDate} at ${formattedTime}</strong><br>Please refresh the page when it's time.`);
-                        return; // Stop exam from loading
+                        return; 
                     }
+
+                    // B) Agar test end time ke baad aaya hai (Deadline miss)
+                    if (currentTime >= testEndTime) {
+                        showError(`⏳ Exam Over!<br><br>Yeh test <strong>${testEndTime.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}</strong> par khatam ho chuka hai. Ab aap ise nahi de sakte.`);
+                        return;
+                    }
+
+                    // C) Agar beech mein aaya hai, toh sirf bacha hua time milega
+                    remainingSeconds = Math.floor((testEndTime.getTime() - currentTime.getTime()) / 1000);
                 }
 
                 // Class Match Restriction
@@ -223,10 +243,8 @@
                 renderQuestions();
                 startCamera();
                 
-                // Timer Logic
-                const allottedMinutes = testData.duration ? parseInt(testData.duration) : 15;
-                const totalSeconds = allottedMinutes * 60;
-                startTimer(totalSeconds);
+                // Start Live Timer
+                startTimer(remainingSeconds);
 
             } catch (error) {
                 console.error(error);
@@ -272,7 +290,7 @@
             }, 1000);
         }
 
-        // 🚀 FIX 2: Advanced Anti-Cheating System
+        // Advanced Anti-Cheating System
         async function startCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
@@ -281,7 +299,6 @@
             } catch (err) { console.warn("Camera access denied."); }
         }
 
-        // Handles cheating detection for both Tab Switch (visibilitychange) & Clicking outside window (blur)
         function handleCheatingDetection() {
             if (document.getElementById("examContainer").style.display === "block") {
                 cheatWarnings++;
@@ -305,15 +322,13 @@
             handleCheatingDetection();
         });
 
-        // 🚀 FIX 3: Dynamic Canvas Aspect Ratio (No compressed images)
+        // Dynamic Canvas Aspect Ratio
         async function captureAndUploadSnapshot(reason) {
             const video = document.getElementById("proctorCamera");
             const canvas = document.getElementById("snapshotCanvas");
             
-            // Only capture if video has loaded properly
             if (video.readyState !== 4 || video.videoWidth === 0) return;
             
-            // Canvas ko exactly camera ki resolution ke barabar set karein
             canvas.width = video.videoWidth; 
             canvas.height = video.videoHeight;
             
@@ -336,7 +351,7 @@
         });
 
         async function submitExamProcess(finalStatus) {
-            clearInterval(timerInterval); // Timer rok do
+            clearInterval(timerInterval); // Stop timer
             document.getElementById("examContainer").style.display = "none";
             document.getElementById("loadingOverlay").style.display = "flex";
             document.getElementById("loadingText").innerText = "Checking Answers & Submitting...";
@@ -357,11 +372,12 @@
                     cheatStatus: finalStatus, submitted: true, submittedAt: new Date().toLocaleString()
                 });
 
+                // 🚀 FIX: Ab return to student-dashboard par jayega
                 document.getElementById("loadingOverlay").innerHTML = `
                     <i class="fa-solid fa-circle-check" style="font-size: 60px; color: #10b981; margin-bottom: 20px;"></i>
                     <h2>Exam Submitted Successfully!</h2>
                     <p style="color: #94a3b8; font-size: 18px;">Score: <strong>${score}/${testQuestions.length}</strong></p>
-                    <button onclick="window.location.href='index.html'" class="submit-btn" style="width: 200px; margin-top:20px;">Return to Home</button>
+                    <button onclick="window.location.href='student-dashboard.html'" class="submit-btn" style="width: 250px; margin-top:20px;">Return to Dashboard</button>
                 `;
             } catch (error) {
                 showError("Failed to submit! Check Internet.");
