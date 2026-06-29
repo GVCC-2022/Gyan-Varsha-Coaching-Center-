@@ -52,27 +52,23 @@ body {
     z-index: 10;
 }
 
-/* ☀️ सूरज की किरणें (अब छोटी और सेंटर में) */
+/* ☀️ सूरज की किरणें (Sun Rays Effect) */
 .logo-glow-wrapper::before {
     content: '';
     position: absolute;
-    /* साइज़ पहले 280px था, अब 190px कर दिया है */
     width: 190px;
     height: 190px;
-    
-    /* 🎯 लाइट का सेंटर फिक्स किया है (इमेज के हिसाब से) */
-    margin-top: 25px;   /* लाइट को थोड़ा नीचे खिसकाया */
-    margin-left: -15px; /* लाइट को थोड़ा बाईं तरफ खिसकाया */
-
+    margin-top: 25px;   
+    margin-left: -15px; 
     border-radius: 50%;
     
+    /* 👇 ब्राइटनेस सेट करने की जगह (0.4 को बढ़ाकर 0.6 या 0.8 करेंगे तो चमक बढ़ेगी) */
     background: repeating-conic-gradient(
         from 0deg,
-        rgba(255, 255, 255, 0.15) 0deg 3deg,
+        rgba(255, 255, 255, 0.4) 0deg 3deg, 
         transparent 3deg 10deg
     );
     
-    /* 🌟 जादुई कोड: यह किरणों को किनारों से धुंधला (Fade) कर देगा */
     -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 70%);
     mask-image: radial-gradient(circle, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 70%);
     
@@ -80,7 +76,7 @@ body {
     z-index: -1;
 }
 
-/* एक्स्ट्रा चमक के लिए */
+/* ☀️ किरणों के बीच का एक्स्ट्रा ग्लो */
 .logo-glow-wrapper::after {
     content: '';
     position: absolute;
@@ -89,7 +85,8 @@ body {
     margin-top: 25px;
     margin-left: -15px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.15);
+    /* 👇 सेंटर की ब्राइटनेस (0.4 को बढ़ा/घटा सकते हैं) */
+    background: rgba(255, 255, 255, 0.4); 
     filter: blur(20px);
     z-index: -1;
 }
@@ -99,12 +96,16 @@ body {
     to { transform: rotate(360deg); }
 }
 
+/* 🎯 Logo Position Adjustments */
 .login-logo {
     width: 250px;
     height: auto;
     filter: drop-shadow(0px 8px 15px rgba(0, 0, 0, 0.5));
     position: relative;
     z-index: 5;
+    
+    /* 👇 लोगो को दाएँ-बाएँ खिसकाने का बटन (25px को बढ़ाकर 30-35px करेंगे तो राइट जाएगा, कम करेंगे तो लेफ्ट आएगा) */
+    left: 25px; 
 }
 
 /* 📦 Premium Dark Glass Card */
